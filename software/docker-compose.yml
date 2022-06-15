@@ -1,0 +1,61 @@
+version: "2.3"
+
+
+services:
+
+  database-server:
+    image: mariadb/server:10.3
+    container_name: ${DB_HOST:-irrigation_database}
+    networks:
+      default:
+        aliases:
+          - ${DB_HOST:-irrigation_database}
+    restart: always
+    volumes:
+      - ./databases/mysql/data:/var/lib/mysql
+    environment:
+      - TZ=Europe/Madrid
+      - MYSQL_ROOT_PASSWORD=${DB_ROOT_PASS:-admin}
+      - MYSQL_DATABASE=${DATABASE:-irrigation}
+      - MYSQL_USER=${DB_USER:-user}
+      - MYSQL_PASSWORD=${DB_PASS:-0123}
+    ports:
+      - ${DB_PORT_BINDED:-3306}:3306
+    logging:
+      driver: none
+
+  broker:
+    image: eclipse-mosquitto
+    container_name: irrigation_broker
+    restart: always
+    volumes:
+      - ./config/mosquitto/mosquitto.conf:/mosquitto/config/mosquitto.conf
+      - ./config/mosquitto/mosquitto_passwd:/mosquitto/config/pwfile
+    ports:
+      - ${BROKER_PORT_BINDED:-1883}:1883
+      - ${BROKER_WEBPORT_BINDED:-8884}:8884
+    logging:
+      driver: none
+
+  mongodb:
+    image: mongo:4.4
+    container_name: ${MONGODB_HOST:-irrigation_mongodb}
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=${MONGODB_USER:-user}
+      - MONGO_INITDB_ROOT_PASSWORD=${MONGODB_PASS:-0123}
+      - MONGO_INITDB_DATABASE=${MONGODB_DATABASE:-irrigation}
+    ports:
+      - "${MONGODB_PORT:-27017}:27017"
+    restart: always
+    volumes:
+      - ./databases/mongodb/docker-entrypoint-initdb.d/nzef.js:/docker-entrypoint-initdb.d/nzef.js:ro
+      - ./databases/mongodb/data:/data/db
+    networks:
+      default:
+        aliases:
+          - ${MONGODB_HOST:-irrigation_mongodb}
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "500k"
+        max-file: "3"
