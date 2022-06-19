@@ -1,5 +1,8 @@
 # Servidor
 
-- manage access to database info
-- manage app microcontrollers
-- set up alarms and notifications
+Servicios implementados:
+
+- servicio de gestión de usuarios y autorización de usuarios (web)
+- backend con la lógica del sistema de riego
+- servicio de recogida de datos
+- simuladores
