@@ -1,4 +1,4 @@
 # -*- coding: utf-8 -*-
 
-HOST = '0.0.0.0'
-PORT = 8080
+API_VERSION = '1.0'
+API_PREFIX = f"/api/{API_VERSION}/irrigation"

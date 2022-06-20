@@ -4,8 +4,8 @@
 import uuid
 
 
-from irrigation.domain.eventos.wrapper import WrapperEventos
-from irrigation.domain.eventos.servicios import ServiciosEventos
+from irrigation.domain.messages.wrapper import WrapperEventos
+from tfm_irrigation_system.software.server.irrigation.domain.messages.services import ServiciosEventos
 import irrigation.settings as settings
 
 

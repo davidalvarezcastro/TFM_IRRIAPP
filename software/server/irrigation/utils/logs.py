@@ -1,6 +1,4 @@
 # -*- coding: utf-8 -*-
-"""Clase wrapper para la gestión de logs de la aplicación
-"""
 import logging
 from logging.handlers import RotatingFileHandler
 import os
@@ -12,14 +10,14 @@ LOGFILE_SIZE = 5  # mb
 
 
 class Log(object):
-    """ Clase para la gestión de Logs
+    """ Logs app manager
     """
 
     def __init__(self, filename=LOGFILE, name=__name__, logger=None):
-        """Inicializamos la configuración del Logs
+        """Init logs config
 
         Args:
-            filename(str): ruta del archivo de logs resultante
+            filename(str): path
             logger(logging.logger): logger
         """
         if logger is None:

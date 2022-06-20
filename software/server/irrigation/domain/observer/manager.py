@@ -1,23 +1,20 @@
 # coding=utf-8
-"""
-    Archivo con el servicio de gestión de eventos (publisher)
-"""
 import attr
 import sys
 import typing
 
 from . import topics as topics
 from utils import logger_error
-from domain.patterns import Pub, Sub, EventoPubSub
-from domain.eventos.servicios import InterfazEventos
+from domain.patterns import Pub, Sub, PubSubEvent
+from irrigation.domain.messages.services import MessagesInterface
 
 
 @attr.s
-class GestorEventos(Pub):
+class EventsManager(Pub):
     """ Control/Gestión de los diferentes eventos
     """
-    queue: typing.Any = attr.ib()  # cola para gestionar excepciones
-    servicio_eventos: InterfazEventos = attr.ib()  # interfaz de comunicación
+    queue: typing.Any = attr.ib()
+    messages_service: MessagesInterface = attr.ib()
     _observers: typing.List[Sub] = attr.ib(default=attr.Factory(list))
 
     # POST INIT HOOK
@@ -41,29 +38,29 @@ class GestorEventos(Pub):
         """
         self._observers.remove(observer)
 
-    def notify(self, evento: EventoPubSub) -> None:
+    def notify(self, event: PubSubEvent) -> None:
         """
         Notifica a todos los observers sobre un evento
 
         Args:
-            evento (EventoPubSub): evento de comunicación indicando el cambio de estado
+            event (PubSubEvent): evento de comunicación indicando el cambio de estado
         """
         for observer in self._observers:
-            observer.update(evento)
+            observer.update(event)
 
     # METHODS
-    def __gestionar_estado_controlador(self, cliente, userdata: dict, mensaje) -> None:
+    def __manage_controller_state(self, client, userdata: dict, mensaje) -> None:
         """Función para gestionar el nuevo estado de los sensores del controlador.
 
         Args:
-            cliente (paho.mqtt.client.Client): información del cliente que recibe el mensaje
+            client (paho.mqtt.client.Client): información del cliente que recibe el mensaje
             userdata (dict): información del cliente (None si no hay)
             mensaje (paho.mqtt.client.MQTTMessage): información del mensaje (payload, topic, qos)
         """
         try:
-            self.notify(evento=EventoPubSub(
-                tipo=topics.ESTADO_CONTROLADOR,
-                datos={
+            self.notify(event=PubSubEvent(
+                type == topics.CONTROLLER_STATE,
+                data={
                     'topic': mensaje.topic,
                     'payload': mensaje.payload
                 }
@@ -71,12 +68,12 @@ class GestorEventos(Pub):
         except Exception as error:
             self.queue.put(sys.exc_info())
             logger_error(
-                nombre="__gestionar_estado_controlador",
+                nombre="__manage_controller_state",
                 error=error
             )
 
-    def iniciar_subscriptores(self) -> None:
+    def init_subs(self) -> None:
         """ Función que permite iniciar los subscriptores del controlador de eventos
         """
-        self.servicio_eventos.sub_estado_sensores_controladores(
-            callback=self.__gestionar_estado_controlador)
+        self.messages_service.sub_sensors_state_controllers(
+            callback=self.__manage_controller_state)

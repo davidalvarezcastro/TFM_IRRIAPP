@@ -1,1 +1,1 @@
-from .pubsub import EventoPubSub, Sub, Pub
+from .pubsub import PubSubEvent, Sub, Pub

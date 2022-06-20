@@ -13,9 +13,9 @@ from utils import Log
 _LOGGER = Log(logger=logging.getLogger('irrigation'))
 
 
-class InterfazDatabase(ABC):
+class DatabaseInterface(ABC):
     """
-    Interfaz de comunicación con una base de datos (conector a DB)
+    Data Base Interface for communication
     """
 
     @abstractmethod
@@ -41,7 +41,7 @@ class InterfazDatabase(ABC):
         raise Exception("NotImplementedException")
 
     @abstractmethod
-    def query(self, sql: str, params: typing.Tuple[str]=()) -> typing.Any:
+    def query(self, sql: str, params: typing.Tuple[str] = ()) -> typing.Any:
         """Ejecuta una consulta SQL genérica.
 
         Args:
@@ -53,7 +53,7 @@ class InterfazDatabase(ABC):
         raise Exception("NotImplementedException")
 
     @abstractmethod
-    def delete(self, sql: str, params: typing.Tuple[str]=()) -> bool:
+    def delete(self, sql: str, params: typing.Tuple[str] = ()) -> bool:
         """Ejecuta una consulta SQL para eliminar registros.
 
         Args:
@@ -65,7 +65,7 @@ class InterfazDatabase(ABC):
         raise Exception("NotImplementedException")
 
     @abstractmethod
-    def select(self, sql: str, params: typing.Tuple[str]=()) -> typing.List[typing.Tuple[typing.Any]]:
+    def select(self, sql: str, params: typing.Tuple[str] = ()) -> typing.List[typing.Tuple[typing.Any]]:
         """Ejecuta una consulta SQL para recuperar una serie de registros.
 
         Args:
@@ -77,7 +77,7 @@ class InterfazDatabase(ABC):
         raise Exception("NotImplementedException")
 
     @abstractmethod
-    def update(self, sql: str, params: typing.Tuple[str]=()) -> typing.List[typing.Tuple[typing.Any]]:
+    def update(self, sql: str, params: typing.Tuple[str] = ()) -> typing.List[typing.Tuple[typing.Any]]:
         """Ejecuta una consulta SQL para actualizar una serie de registros.
 
         Args:
@@ -89,15 +89,14 @@ class InterfazDatabase(ABC):
         raise Exception("NotImplementedException")
 
 
-
 @attr.s
-class DatabaseConector(InterfazDatabase):
+class DatabaseConector(DatabaseInterface):
     host: str = attr.ib()
     port: int = attr.ib()
     _user: str = attr.ib()
     _password: str = attr.ib()
     database: str = attr.ib()
-    new_connection: bool = attr.ib(default=False) # nueva conexión por consulta
+    new_connection: bool = attr.ib(default=False)  # new connection for each query
 
     # POST INIT HOOK
     def __attrs_post_init__(self):
@@ -133,7 +132,7 @@ class DatabaseConector(InterfazDatabase):
         except Exception:
             pass
 
-    def query(self, sql: str, params: typing.Tuple[str]=()) -> typing.Any:
+    def query(self, sql: str, params: typing.Tuple[str] = ()) -> typing.Any:
         try:
             if self.new_connection:
                 self.init_connection()
@@ -151,7 +150,7 @@ class DatabaseConector(InterfazDatabase):
                 pass
             return None
 
-    def select(self, sql: str, params: typing.Tuple[str]=()) -> typing.List[typing.Tuple[typing.Any]]:
+    def select(self, sql: str, params: typing.Tuple[str] = ()) -> typing.List[typing.Tuple[typing.Any]]:
         try:
             result = None
             self.query(sql, params)
@@ -164,7 +163,7 @@ class DatabaseConector(InterfazDatabase):
             _LOGGER.error('database => select {} => {}'.format(sql, str(err)))
             return None
 
-    def delete(self, sql: str, params: typing.Tuple[str]=()) -> bool:
+    def delete(self, sql: str, params: typing.Tuple[str] = ()) -> bool:
         try:
             self.query(sql, params)
             self.connector.commit()
@@ -177,7 +176,7 @@ class DatabaseConector(InterfazDatabase):
             _LOGGER.error('database => delete {} => {}'.format(sql, str(err)))
             return False
 
-    def update(self, sql: str, params: typing.Tuple[str]=()) -> bool:
+    def update(self, sql: str, params: typing.Tuple[str] = ()) -> bool:
         try:
             self.query(sql, params)
             self.connector.commit()
@@ -189,4 +188,3 @@ class DatabaseConector(InterfazDatabase):
         except Exception as err:
             _LOGGER.error('database => update {} => {}'.format(sql, str(err)))
             return False
-

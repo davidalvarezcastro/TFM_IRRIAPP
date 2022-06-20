@@ -6,10 +6,10 @@ import attr
 
 
 @attr.s
-class EventoPubSub:
+class PubSubEvent:
     """ Clase que define los eventos de comunicación en el patrón Observer """
-    tipo: str = attr.ib()
-    datos: dict = attr.ib()
+    type: str = attr.ib()
+    data: dict = attr.ib()
 
 
 class Sub(ABC):
@@ -18,12 +18,12 @@ class Sub(ABC):
     """
 
     @abstractmethod
-    def update(self, evento: EventoPubSub) -> None:
+    def update(self, event: PubSubEvent) -> None:
         """
         Recibe las actualizaciones del estado
 
         Args:
-            evento (EventoPubSub): evento de comunicación indicando el cambio de estado
+            event (PubSubEvent): evento de comunicación indicando el cambio de estado
         """
         pass
 
@@ -52,11 +52,11 @@ class Pub(ABC):
         pass
 
     @abstractmethod
-    def notify(self, evento: EventoPubSub) -> None:
+    def notify(self, event: PubSubEvent) -> None:
         """
         Notifica a todos los observers sobre un evento
 
         Args:
-            evento (EventoPubSub): evento de comunicación indicando el cambio de estado
+            event (PubSubEvent): evento de comunicación indicando el cambio de estado
         """
         pass

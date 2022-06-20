@@ -1,14 +1,10 @@
 # -*- coding: utf-8 -*-
-"""
-    Clase wrapper para la gestión de las conexiones a al servidor de eventos del
-    control de flota
-"""
 import paho.mqtt.client
 import threading
 import time
 
 
-class WrapperEventos():
+class MessagesClientWrapper():
     """Clase para la gestión de conexiones al broker"""
 
     def __init__(self, id="", user="admin", password="admin", host="localhost", port=1883):
@@ -26,21 +22,21 @@ class WrapperEventos():
         self._host = host
         self._port = port
         self.__will = None  # variable para almacenar el will en caso de no conexión
-        self.__lista_subs = []  # variable para almacenar la lista de subs en caso de no conexión
+        self.__subs_list = []  # variable para almacenar la lista de subs en caso de no conexión
 
-        self._control_reintentar_conexion = {
+        self._retry_connection_manager = {
             'thread': threading.Thread().start(),
             'event': threading.Event(),
             'activo': False,
             'lock': threading.Lock(),
         }
 
-        self.__configurar_cliente()
+        self.__setup_client()
 
         if self.__mqttclient is None:
-            self._modo_reintentos()
+            self._retry_mode()
 
-    def __configurar_cliente(self):
+    def __setup_client(self):
         """Configura un cliente MQTT y establece la comunicacion con el broker.
 
         Args:
@@ -56,7 +52,7 @@ class WrapperEventos():
         except Exception:
             self.__mqttclient = None
 
-    def iniciar(self):
+    def run(self):
         """Inicia el bucle de comunicación con el broker
 
         Importante: especificar last will antes de ejecutar esta función!
@@ -67,27 +63,27 @@ class WrapperEventos():
         self.__mqttclient.connect(self._host, port=self._port)
         self.__mqttclient.loop_start()
 
-    def _modo_reintentos(self):
+    def _retry_mode(self):
         """Hilo para lanzar la comprobación de conexiones
         """
         stop_event = threading.Event()
         hilo_reintentos = threading.Thread(
-            target=self._hilo_modo_reintentos, args=(stop_event,))
+            target=self._retry_mode_thread, args=(stop_event,))
         hilo_reintentos.daemon = True
 
-        self._control_reintentar_conexion['thread'] = hilo_reintentos
-        self._control_reintentar_conexion['event'] = stop_event
-        self._control_reintentar_conexion['activo'] = True
+        self._retry_connection_manager['thread'] = hilo_reintentos
+        self._retry_connection_manager['event'] = stop_event
+        self._retry_connection_manager['activo'] = True
 
         hilo_reintentos.start()
 
-    def _hilo_modo_reintentos(self, stop_event, infinito=True):
+    def _retry_mode_thread(self, stop_event, forever=True):
         """Reintamos la conexión con el broker.
 
         Args:
             stop_event (threading.Event): flag para detener la ejecucion del
                 hilo.
-            infinito(bool): indica si los reintentos son infinitos. Por defecto
+            forever(bool): indica si los reintentos son forevers. Por defecto
             a True.
         """
         reintentos = 1
@@ -95,18 +91,18 @@ class WrapperEventos():
         while self.__mqttclient is None:
             time.sleep(5)
             self._id = self._id + '_r' + str(reintentos)
-            self.__configurar_cliente()
+            self.__setup_client()
             reintentos += 1
 
-            if not infinito:
+            if not forever:
                 if reintentos > 10:
                     break
         if self.__will is not None:
             self.set_last_will(topic=self.__will['topic'],
                                payload=self.__will['payload'],
                                qos=self.__will['qos'])
-        if len(self.__lista_subs) > 0:
-            for sub in self.__lista_subs:
+        if len(self.__subs_list) > 0:
+            for sub in self.__subs_list:
                 self.sub(topic=sub['topic'],
                          funcion=sub['funcion'], qos=sub['qos'])
 
@@ -144,7 +140,7 @@ class WrapperEventos():
             self.__mqttclient.subscribe(topic)
             self.__mqttclient.message_callback_add(topic, funcion)
         except Exception:
-            self.__lista_subs.append({
+            self.__subs_list.append({
                 'topic': topic,
                 'funcion': funcion,
                 'qos': qos

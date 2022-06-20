@@ -1,11 +1,11 @@
-""" Archivo con diferentes variables para el correcto funcionamiento de
-la aplicación
+"""
+Settings files with variables used in the app
 """
 from dotenv import load_dotenv
 import os
 
 
-load_dotenv()  # cargamos las variables de entorno
+load_dotenv()  # loading env variables
 
 
 # MODO
@@ -14,7 +14,7 @@ MODE = os.getenv('MODE', 'dev')
 
 # DB
 DB_HOST = os.getenv('DB_HOST', 'localhost')
-DB_PORT = int(os.getenv('DB_PORT', '3306'))
+DB_PORT = int(os.getenv('DB_PORT', 3306))
 DB_USER = os.getenv('DB_USER', 'user')
 DB_ROOT_PASSWORD = os.getenv('DB_ROOT_PASS', 'shhhh it is a secret!')
 DB_PASSWORD = os.getenv('DB_PASS', 'shhhh it is also a secret!')
@@ -31,9 +31,8 @@ MONGODB_DATABASE = os.getenv('MONGODB_DATABASE', 'irrigation')
 
 # API
 API_HOST = os.getenv('API_HOST', '0.0.0.0')
-API_PORT = int(os.getenv('API_PORT', '5000'))
-API_VERSION = '1.0'
-API_PREFIX = f"/api/{API_VERSION}/irrigation"
+API_PORT = int(os.getenv('API_PORT', 5000))
+
 
 TIMEOUT = 2
 REINTENTOS = 3
@@ -45,13 +44,7 @@ FORMAT_DATES = "%Y-%m-%dT%H:%M:%SZ"
 
 
 # MQTT
-MQTT_BROKER_IP = os.getenv('SGE_HOST_LOCAL') if bool(int(os.getenv('MQTT_DOCKER'))) else \
-    (os.getenv('SGE_HOST') if os.getenv(
-        'SGE_HOST') is not None else '1.1.10.235')
-MQTT_BROKER_PORT = int(os.getenv('SGE_PORT')) if bool(int(os.getenv('MQTT_DOCKER'))) else \
-    (int(os.getenv('SGE_PORT_BINDED')) if os.getenv(
-        'SGE_PORT_BINDED') is not None else 1884)
-MQTT_BROKER_AUTH_USERNAME = os.getenv('SGE_USER') if os.getenv(
-    'SGE_USER') is not None else 'username'
-MQTT_BROKER_AUTH_PASSWORD = os.getenv('SGE_PASS') if os.getenv(
-    'SGE_PASS') is not None else 'password'
+MQTT_BROKER_IP = os.getenv('MQTT_HOST', 'localhost')
+MQTT_BROKER_PORT = int(os.getenv('MQTT_PORT', '3306'))
+MQTT_BROKER_AUTH_USERNAME = os.getenv('MQTT_USER', 'user')
+MQTT_BROKER_AUTH_PASSWORD = os.getenv('MQTT_PASS', 'shhhh it is a secret!')

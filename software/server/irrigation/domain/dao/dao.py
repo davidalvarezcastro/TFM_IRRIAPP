@@ -2,9 +2,10 @@
 import attr
 
 
-from domain.dao.database import InterfazDatabase
+from domain.dao.database import DatabaseInterface
+
 
 @attr.s
 class DAO():
-    """ Clase padre para gestionar los Data Access Object """
-    db: InterfazDatabase = attr.ib() # instancia conector base de datos
+    """  Data Access Object """
+    db: DatabaseInterface = attr.ib()
