@@ -20,7 +20,7 @@ services:
       - MYSQL_USER=${DB_USER:-user}
       - MYSQL_PASSWORD=${DB_PASS:-0123}
     ports:
-      - ${DB_PORT_BINDED:-3306}:3306
+      - ${DB_PORT_BINDED:-3306}:${DB_PORT:-3306}
     logging:
       driver: none
 
@@ -32,8 +32,8 @@ services:
       - ./config/mosquitto/mosquitto.conf:/mosquitto/config/mosquitto.conf
       - ./config/mosquitto/mosquitto_passwd:/mosquitto/config/pwfile
     ports:
-      - ${BROKER_PORT_BINDED:-1883}:1883
-      - ${BROKER_WEBPORT_BINDED:-8884}:8884
+      - ${BROKER_PORT_BINDED:-1883}:${BROKER_PORT:-1883}
+      - ${BROKER_WEBPORT_BINDED:-8884}:${BROKER_WEBPORT:-8884}
     logging:
       driver: none
 
@@ -45,7 +45,7 @@ services:
       - MONGO_INITDB_ROOT_PASSWORD=${MONGODB_PASS:-0123}
       - MONGO_INITDB_DATABASE=${MONGODB_DATABASE:-irrigation}
     ports:
-      - "${MONGODB_PORT:-27017}:27017"
+      - "${MONGODB_PORT_BINDED:-27017}:${MONGODB_PORT:-27017}"
     restart: always
     volumes:
       - ./databases/mongodb/docker-entrypoint-initdb.d/nzef.js:/docker-entrypoint-initdb.d/nzef.js:ro
@@ -59,3 +59,24 @@ services:
       options:
         max-size: "500k"
         max-file: "3"
+
+  api:
+    container_name: ${API_HOST}
+    networks:
+      default:
+        aliases:
+          - ${API_HOST}
+    build:
+      context: .
+      dockerfile: ./config/docker/api.Dockerfile
+      args:
+        - LOGS_FOLDER=logs
+    restart: always
+    env_file: .env
+    volumes:
+      - ./server/irrigation:/irrigation
+      - ./logs:/irrigation/logs
+      - ./.env:/irrigation/.env
+      - ./server/irrigation/requirements.txt:/irrigation/requirements.txt
+    ports:
+      - ${API_PORT}:5000
