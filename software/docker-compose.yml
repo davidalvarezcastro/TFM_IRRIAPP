@@ -63,8 +63,8 @@ services:
         max-size: "500k"
         max-file: "3"
 
-  # api aut
-  service-oauth-users:
+  # api auth
+  server-auth:
     container_name: irrigation_auth
     networks:
       default:
@@ -77,22 +77,14 @@ services:
         - LOGS_FOLDER=logs
     env_file: .env
     restart: always
-    volumes:
-      - ./auth/src:/users/src
-      - ./logs:/users/logs
-      - ./.env:/users/.env
-      - ./auth/requirements.txt:/users/requirements.txt
-      - ./auth/wsgi.py:/users/wsgi.py
-      - ./auth/run.py:/users/run.py
-      - ./auth/init_database.py:/users/init_database.py
     ports:
       - ${AUTH_API_PORT}:5000
     mem_limit: 1500m
     memswap_limit: 100m
     cpus: 1.0
     cpu_shares: 614
-    logging:
-      driver: "none"
+    # logging:
+    #   driver: "none"
 
   # nginx inverse proxy
   # nginx:

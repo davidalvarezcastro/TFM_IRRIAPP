@@ -1,6 +1,6 @@
 
 from flask import Response, request
-from flask_restplus import Namespace, Resource
+from flask_restx import Namespace, Resource
 
 from src.util.http_codes import Status
 from src.dto.login import LoginSchema
@@ -10,7 +10,7 @@ from src.dao.user import DAOUser
 from src.util.authentication import AccessToken, check_passwords
 
 
-api_auth = Namespace('auth', description='User Auth Api')
+api_auth = Namespace('auth', description='auth service')
 
 
 @api_auth.route('/login')
@@ -104,7 +104,6 @@ class Logout(Resource):
                 )
                 token.delete_instance()
             except Exception as e:
-                print(e)
                 pass
 
         return DTOBase(Status.HTTP_200_OK, {

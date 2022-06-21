@@ -1,4 +1,4 @@
-from flask_restplus import Namespace, Resource
+from flask_restx import Namespace, Resource
 from flask import request
 import marshmallow as ma
 
@@ -11,7 +11,7 @@ from src.util.database import requires_user
 from src.util.authentication import requires_auth, requires_admin_auth, \
     check_auth, encode_password, generate_salt
 
-api_user = Namespace('user', description='User Api')
+api_user = Namespace('user', description='user service')
 
 
 @api_user.route('/<string:user_id>')

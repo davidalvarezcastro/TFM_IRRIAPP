@@ -1,11 +1,11 @@
 
-from flask_restplus import Namespace, Resource, fields as fields_rest
+from flask_restx import Namespace, Resource, fields as fields_rest
 
 from src.util.http_codes import Status
 from src.dto.dto import DTOError, DTOBase
 
 
-api_ping = Namespace('ping', description='PingPong Api')
+api_ping = Namespace('ping', description='ping-pong service')
 
 
 @api_ping.route('/')

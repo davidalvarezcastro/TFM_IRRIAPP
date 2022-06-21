@@ -1,6 +1,6 @@
 import marshmallow as ma
 from .dto import DTOBase
-from flask_restplus import fields as fields_rest
+from flask_restx import fields as fields_rest
 
 
 class UserSchema(ma.Schema):

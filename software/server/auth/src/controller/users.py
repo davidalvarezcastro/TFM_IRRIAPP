@@ -1,4 +1,4 @@
-from flask_restplus import Namespace, Resource
+from flask_restx import Namespace, Resource
 from flask import request
 
 from src.dto.dto import DTOError
@@ -6,7 +6,7 @@ from src.dto.user import DTOUsers, DTOUser
 from src.dao.user import DAOUser
 from src.util.http_codes import Status
 from src.util.authentication import requires_admin_auth, check_auth
-api_users = Namespace('users', description='User Api')
+api_users = Namespace('users', description='users service')
 
 
 @api_users.route('')

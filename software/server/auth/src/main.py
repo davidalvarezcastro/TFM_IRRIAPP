@@ -1,6 +1,6 @@
 import os
 from flask import Flask, Blueprint
-from flask_restplus import Api
+from flask_restx import Api
 from dotenv import load_dotenv
 
 from src.controller.ping import api_ping

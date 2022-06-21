@@ -56,10 +56,6 @@ class GestorPeticionesRest:
                                '\tdata: {}\n\n'.format(
                                    prep_request.body if prep_request.body else ''),
                                exc_info=True)
-            print('\n\n\n\t[ERROR] %s %s\n%s', prep_request.method,
-                               prep_request.url,
-                               '\tdata: {}\n\n'.format(
-                                   prep_request.body if prep_request.body else ''))
             respuesta = None
         return respuesta
 

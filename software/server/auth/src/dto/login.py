@@ -1,5 +1,5 @@
 from marshmallow import Schema, fields
-from flask_restplus import fields as fields_rest
+from flask_restx import fields as fields_rest
 
 
 class LoginSchema(Schema):

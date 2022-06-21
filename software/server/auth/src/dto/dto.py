@@ -1,6 +1,6 @@
 import json
 from flask import Response
-from flask_restplus import fields
+from flask_restx import fields
 
 
 class DTOBase():

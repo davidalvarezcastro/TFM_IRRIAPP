@@ -1,6 +1,6 @@
 # auto-generated snapshot
 from peewee import AutoField, CharField, BooleanField, \
-                   DateTimeField, SQL, Snapshot, Model
+                   DateTimeField, SQL, Model
 
 snapshot = Snapshot()
 
