@@ -1,0 +1,9 @@
+#ifndef COMMANDS
+#define COMMANDS
+
+enum COMMANDS_DISPATCHER
+{
+  SEND_DATA_MQTT,
+};
+
+#endif
