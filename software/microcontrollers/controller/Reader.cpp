@@ -14,45 +14,15 @@ void Reader::readSensors()
   this->readRaining();
 }
 
-String Reader::getDataHumidity()
+String Reader::getData()
 {
-  StaticJsonDocument<50> doc;
-  String dataFormatted;
+  String dataFormatted = "";
 
   // setting up sensors data
-  doc["value"] = this->humidity;
-  doc["unit"] = "%";
+  dataFormatted += String(this->humidity) + SERIAL_SEPARATOR_STRING + "%";
+  dataFormatted += SERIAL_SEPARATOR_STRING + String(this->temperature) + SERIAL_SEPARATOR_STRING + "Celsius";
+  dataFormatted += SERIAL_SEPARATOR_STRING + String(this->isRaining) + SERIAL_SEPARATOR_STRING + "bool";
 
-  // return data as stringify json
-  serializeJson(doc, dataFormatted);
-  return dataFormatted;
-}
-
-String Reader::getDataTemperature()
-{
-  StaticJsonDocument<50> doc;
-  String dataFormatted;
-
-  // setting up sensors data
-  doc["value"] = this->temperature;
-  doc["unit"] = "Celsius";
-
-  // return data as stringify json
-  serializeJson(doc, dataFormatted);
-  return dataFormatted;
-}
-
-String Reader::getDataRaining()
-{
-  StaticJsonDocument<50> doc;
-  String dataFormatted;
-
-  // setting up sensors data
-  doc["value"] = this->isRaining;
-  doc["unit"] = "bool";
-
-  // return data as stringify json
-  serializeJson(doc, dataFormatted);
   return dataFormatted;
 }
 

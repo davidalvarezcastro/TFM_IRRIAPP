@@ -3,8 +3,8 @@
 
 #include <Arduino.h>
 #include <SoftwareSerial.h>
-#include "./libraries/ArduinoJson.h"
 #include "pinout.h"
+#include "config.h"
 
 class Reader
 {
@@ -22,23 +22,9 @@ public:
   /**
    * Function to get sensors data formatted
    *
-   * @return String sensor data formatted as json (string)
+   * @return String sensor data formatted (to be processed by serial port)
    */
-  String getDataHumidity();
-
-  /**
-   * Function to get sensors data formatted
-   *
-   * @return String sensor data formatted as json (string)
-   */
-  String getDataTemperature();
-
-  /**
-   * Function to get sensors data formatted
-   *
-   * @return String sensor data formatted as json (string)
-   */
-  String getDataRaining();
+  String getData();
 
 private:
   Reader() = default; // Make constructor private
