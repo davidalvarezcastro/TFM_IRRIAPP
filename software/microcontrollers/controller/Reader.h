@@ -24,7 +24,21 @@ public:
    *
    * @return String sensor data formatted as json (string)
    */
-  String getData();
+  String getDataHumidity();
+
+  /**
+   * Function to get sensors data formatted
+   *
+   * @return String sensor data formatted as json (string)
+   */
+  String getDataTemperature();
+
+  /**
+   * Function to get sensors data formatted
+   *
+   * @return String sensor data formatted as json (string)
+   */
+  String getDataRaining();
 
 private:
   Reader() = default; // Make constructor private

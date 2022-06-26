@@ -26,8 +26,11 @@ void loop()
 {
   // read data from connected sensors
   Reader::getInstance()->readSensors();
-  manager.sendCommand(SEND_DATA_MQTT, Reader::getInstance()->getData());
 
   // send data to dispatcher
+  manager.sendCommand(SEND_HUMIDITY_MQTT, Reader::getInstance()->getDataHumidity());
+  manager.sendCommand(SEND_TEMPERATURE_MQTT, Reader::getInstance()->getDataTemperature());
+  manager.sendCommand(SEND_RAINING_MQTT, Reader::getInstance()->getDataRaining());
+
   delay(DELAY_LOOP);
 }
