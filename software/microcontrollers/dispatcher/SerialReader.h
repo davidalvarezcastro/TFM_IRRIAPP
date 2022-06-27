@@ -10,36 +10,29 @@ class SerialReader
 {
 public:
   /**
-   * Initialize serial reader instance
-   *
-   * @param {int} pinRx
-   * @param {int} pinTx
-   */
-  void init(int pinRx, int pinTx);
-
-  /**
    * Initialize reading
+   *
+   * @param {SoftwareSerial *} serial
    */
-  void readSerial();
+  void readSerial(SoftwareSerial *s);
 
   /**
-   * Function to process serial communication and get sen command
+   * Function to process serial communication and get sended command
    *
-   * @return command
+   * @return command as string
    */
   String getCommand();
 
   /**
    * Function to process serial communication and get data to be sent
    *
-   * @return command
+   * @return data as string
    */
   String getData();
 
 private:
-  SoftwareSerial *s;
   String command;
-  String data;
+  String data; // format <command>;<sensor_value>;<sensor_unit>;<sensor_value>;<sensor_unit>; .... #
 };
 
 #endif
