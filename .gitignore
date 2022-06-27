@@ -121,5 +121,8 @@ ENV/
 logs/*.log
 logs/*.logs
 
-#mongo
+# mongo
 nzef.js
+
+# joker files
+*_no_git*
