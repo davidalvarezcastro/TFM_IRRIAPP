@@ -1,7 +1,7 @@
 #ifndef CONFIG
 #define CONFIG
 
-#define DELAY_LOOP 1000 // 1 second delay
+#define DELAY_LOOP 300000 // 5 minutes delay
 
 // serial settings
 #define SERIAL_DEFAULT_BAUND 9600
