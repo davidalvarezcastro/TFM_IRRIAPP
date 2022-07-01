@@ -1,10 +1,18 @@
 version: "2.3"
 
 
+# Volumes
+volumes:
+  mysql_database_volume:
+    driver: local
+  mongo_database_volume:
+    driver: local
+
+
 services:
 
   database-server:
-    image: mariadb/server:10.3
+    image: mariadb:10.7.4
     container_name: ${DB_HOST:-irrigation_database}
     networks:
       default:
@@ -12,7 +20,7 @@ services:
           - ${DB_HOST:-irrigation_database}
     restart: always
     volumes:
-      - ./databases/mysql/data:/var/lib/mysql
+      - mysql_database_volume:/var/lib/mysql
     environment:
       - TZ=Europe/Madrid
       - MYSQL_ROOT_PASSWORD=${DB_ROOT_PASS:-admin}
@@ -49,7 +57,7 @@ services:
     restart: always
     volumes:
       - ./databases/mongodb/docker-entrypoint-initdb.d/nzef.js:/docker-entrypoint-initdb.d/nzef.js:ro
-      - ./databases/mongodb/data:/data/db
+      - mongo_database_volume:/data/db
     networks:
       default:
         aliases:
