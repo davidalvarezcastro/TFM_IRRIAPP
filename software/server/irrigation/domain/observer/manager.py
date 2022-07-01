@@ -6,7 +6,7 @@ import typing
 from . import topics as topics
 from utils import logger_error
 from domain.patterns import Pub, Sub, PubSubEvent
-from irrigation.domain.messages.services import MessagesInterface
+from domain.messages.services import MessagesInterface
 
 
 @attr.s

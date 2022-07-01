@@ -1,50 +1,57 @@
 """
 Settings files with variables used in the app
 """
-from dotenv import load_dotenv
+from dotenv import load_dotenv, dotenv_values
+# dotenv_values("/var/oee_services/.env") con esto funciona....
 import os
+from globals import TIMEOUT, BACKOFF_FACTOR, REINTENTOS, FORMAT_DATES
 
 
-load_dotenv()  # loading env variables
+# load_dotenv()  # loading env variables
+env = dotenv_values()  # loading env without altering the environment
+
+# To specify messages' topics => domain/messages/topics.py
+# To specify observer events' topic => domain/observer/topics.py
 
 
 # MODO
-MODE = os.getenv('MODE', 'dev')
-
-
-# DB
-DB_HOST = os.getenv('DB_HOST', 'localhost')
-DB_PORT = int(os.getenv('DB_PORT', 3306))
-DB_USER = os.getenv('DB_USER', 'user')
-DB_ROOT_PASSWORD = os.getenv('DB_ROOT_PASS', 'shhhh it is a secret!')
-DB_PASSWORD = os.getenv('DB_PASS', 'shhhh it is also a secret!')
-DB_DATABASE = os.getenv('DB_DATABASE_IRRIGATION', 'irrigation')
-
-
-# MONGODB
-MONGODB_HOST = os.getenv('MONGODB_HOST', '172.17.0.1')
-MONGODB_PORT = int(os.getenv('MONGODB_PORT_BINDED', 27017))
-MONGODB_USER = os.getenv('MONGODB_USER', 'user')
-MONGODB_PASSWORD = os.getenv('MONGODB_PASS', 'shhhh it is a secret!')
-MONGODB_DATABASE = os.getenv('MONGODB_DATABASE', 'irrigation')
-
+MODE = env.get('MODE', 'dev')
 
 # API
-API_HOST = os.getenv('API_HOST', '0.0.0.0')
-API_PORT = int(os.getenv('API_PORT', 5000))
+API_HOST = env.get('API_HOST', '0.0.0.0')
+API_PORT = int(env.get('API_PORT', 5000))
+
+# DATABASES
 
 
-TIMEOUT = 2
-REINTENTOS = 3
-BACKOFF_FACTOR = 0.3
+class DBMySQLSettings():
+    HOST: str = env.get('DB_HOST', 'localhost')
+    PORT: str = int(env.get('DB_PORT', 3306))
+    USER: str = env.get('DB_USER', 'user')
+    PASS: str = env.get('DB_PASS', 'shhhh it is a secret!')
+    ROOT_PASS: str = env.get('DB_ROOT_PASS', 'shhhh it is a secret!')
+    DATABASE: str = env.get('DB_DATABASE_IRRIGATION', 'irrigation')
+    URI: str = env.get('DB_URI_IRRIGATION', 'sqlite:///irrigation.db')
 
 
-# OTHERS
-FORMAT_DATES = "%Y-%m-%dT%H:%M:%SZ"
+class DBMongoSettings():
+    HOST: str = env.get('MONGODB_HOST', 'localhost')
+    PORT: str = int(env.get('MONGODB_PORT', 3306))
+    USER: str = env.get('MONGODB_USER', 'user')
+    PASS: str = env.get('MONGODB_PASS', 'shhhh it is a secret!')
+    DATABASE: str = env.get('MONGODB_DATABASE', 'irrigation')
+    URI: str = env.get('MONGODB_URI', None)
 
 
 # MQTT
-MQTT_BROKER_IP = os.getenv('MQTT_HOST', 'localhost')
-MQTT_BROKER_PORT = int(os.getenv('MQTT_PORT', '3306'))
-MQTT_BROKER_AUTH_USERNAME = os.getenv('MQTT_USER', 'user')
-MQTT_BROKER_AUTH_PASSWORD = os.getenv('MQTT_PASS', 'shhhh it is a secret!')
+class MessagesSettings():
+    HOST: str = env.get('MQTT_HOST', 'localhost')
+    PORT: str = int(env.get('MQTT_PORT', '3306'))
+    USER: str = env.get('MQTT_USER', 'user')
+    PASS: str = env.get('MQTT_PASS', 'shhhh it is a secret!')
+
+
+# settings classes
+db_mysql_settings = DBMySQLSettings()
+db_mongo_settings = DBMongoSettings()
+messages_settings = MessagesSettings()

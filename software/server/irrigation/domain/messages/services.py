@@ -1,5 +1,4 @@
 # coding=utf-8
-from xmlrpc.client import boolean
 import attr
 import json
 from abc import ABC, abstractmethod

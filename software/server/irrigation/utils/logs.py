@@ -2,7 +2,7 @@
 import logging
 from logging.handlers import RotatingFileHandler
 import os
-import irrigation.settings as settings
+import settings as settings
 
 LOG_FORMAT_STR = '[%(asctime)s] %(levelname)s - %(message)s'
 LOGFILE = f"/logs/irrigation_{settings.MODE}.log"
