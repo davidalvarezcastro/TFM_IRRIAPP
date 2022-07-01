@@ -16,13 +16,15 @@ RUN pip3 install --upgrade pip
 RUN pip install gunicorn
 
 RUN mkdir /irrigation
+RUN mkdir /logs
 RUN chmod -R 777 /irrigation
+RUN chmod -R 777 /logs
 
 VOLUME "/irrigation"
+VOLUME "/logs"
 VOLUME /irrigation/$LOGS_FOLDER
 WORKDIR /irrigation
 
 EXPOSE 5000
 
-# CMD pip install -r requirements.txt && python3 main.py
 CMD pip install -r requirements.txt && gunicorn -b 0.0.0.0:5000 wsgi:app
