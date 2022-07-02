@@ -1,9 +1,13 @@
 from datetime import datetime
-from sqlalchemy import Column, Integer, Boolean, SmallInteger, String, Text, TIMESTAMP, \
+from sqlalchemy import Column, Integer, SmallInteger, String, Text, TIMESTAMP, \
     ForeignKey, event, text, DDL
 
 from domain.database.data_mysql import DATA_TYPES, DATA_AREAS, DATA_CONTROLLERS
 from domain.database.database import Base, engine
+
+
+def is_sqlite() -> bool:
+    return engine.dialect.name == 'sqlite'
 
 
 class TypesORM(Base):
@@ -38,9 +42,9 @@ class AreasORM(Base):
     id = Column(Integer, primary_key=True)
     name = Column(String(25), nullable=False)
     description = Column(Text, nullable=True)
-    visible = Column(Boolean, server_default="1")
+    visible = Column(SmallInteger, server_default="1")
     date = Column(TIMESTAMP, nullable=False,
-                  server_default=text("current_timestamp()"))
+                  server_default=text("current_timestamp()" if not is_sqlite() else "current_timestamp"))
 
     def __init__(self, id: int, name: str, description: str = None, visible: bool = False, date: str = None):
         self.id = id
@@ -75,9 +79,9 @@ class ControllersORM(Base):
     name = Column(String(25), nullable=False)
     description = Column(Text, nullable=True)
     key = Column(String(128), nullable=True)
-    visible = Column(Boolean, server_default="1")
+    visible = Column(SmallInteger, server_default="1")
     date = Column(TIMESTAMP, nullable=False,
-                  server_default=text("current_timestamp()"))
+                  server_default=text("current_timestamp()" if not is_sqlite() else "current_timestamp"))
 
     def __init__(
             self, area: int, id: int, name: str, description: str = None, key: str = None, visible: bool = False,

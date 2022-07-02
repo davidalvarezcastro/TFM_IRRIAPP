@@ -1,0 +1,16 @@
+version: "2.3"
+
+services:
+
+  broker_testing:
+    image: eclipse-mosquitto
+    container_name: irrigation_broker_testing
+    restart: always
+    volumes:
+      - ../config/mosquitto/mosquitto.conf:/mosquitto/config/mosquitto.conf
+      - ../config/mosquitto/mosquitto_passwd:/mosquitto/config/pwfile
+    ports:
+      - ${BROKER_PORT_BINDED:-1883}:${BROKER_PORT:-1883}
+      - ${BROKER_WEBPORT_BINDED:-8884}:${BROKER_WEBPORT:-8884}
+    logging:
+      driver: none

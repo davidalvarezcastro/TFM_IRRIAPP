@@ -47,7 +47,7 @@ class MessagesClientWrapper():
                 client_id=self._id,
                 protocol=paho.mqtt.client.MQTTv311,
                 transport='tcp',
-                userdata={'controlador_agv': self})
+                userdata={'controller': self})
             self.__mqttclient.username_pw_set(self._user, self._password)
         except Exception:
             self.__mqttclient = None

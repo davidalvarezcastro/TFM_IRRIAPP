@@ -12,6 +12,7 @@ pymongo==4.1.1
 SQLAlchemy==1.4.39
 
 # Do not change those
+click
 pep8==1.7.1
 flake8==3.9.2
 autopep8==1.5.7

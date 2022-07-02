@@ -31,7 +31,7 @@ class DBMySQLSettings():
     PASS: str = env.get('DB_PASS', 'shhhh it is a secret!')
     ROOT_PASS: str = env.get('DB_ROOT_PASS', 'shhhh it is a secret!')
     DATABASE: str = env.get('DB_DATABASE_IRRIGATION', 'irrigation')
-    URI: str = env.get('DB_URI_IRRIGATION', 'sqlite:///irrigation.db')
+    URI: str = env.get('DB_URI_IRRIGATION', 'sqlite://')
 
 
 class DBMongoSettings():
