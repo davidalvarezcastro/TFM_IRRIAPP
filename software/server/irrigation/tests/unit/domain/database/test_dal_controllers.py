@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-    areas dal tests
+    controllers dal tests
 """
 import datetime
 import json

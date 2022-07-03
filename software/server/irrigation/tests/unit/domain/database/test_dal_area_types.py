@@ -1,11 +1,8 @@
 # -*- coding: utf-8 -*-
 """
-    areas dal tests
+    area types dal tests
 """
-import datetime
-import json
 import os
-import time
 import unittest
 
 from unittest.mock import Mock, patch
