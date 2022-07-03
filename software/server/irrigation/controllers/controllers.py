@@ -20,7 +20,7 @@ class ControllerControllers():
         ControllersDAL.delete(controller=controller)
 
     def get_by_id(self, controller: int, all_visibility: bool = False) -> Controller:
-        ControllersDAL.get_by_id(controller=controller, all_visibility=all_visibility)
+        return ControllersDAL.get_by_id(controller=controller, all_visibility=all_visibility)
 
     def get_all(self, all_visibility: bool = False) -> typing.List[Controller]:
-        ControllersDAL.get_all(all_visibility=all_visibility)
+        return ControllersDAL.get_all(all_visibility=all_visibility)
