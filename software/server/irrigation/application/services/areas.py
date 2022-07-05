@@ -2,11 +2,11 @@
 
 import typing
 from domain.models.areas import Area
-from domain.database.dal.areas import AreasDAL
-from domain.exceptions.database import ExceptionDatabase
+from repositories.database.dal.areas import AreasDAL
+from exceptions.database import ExceptionDatabase
 
 
-class ControllerAreas():
+class ServiceAreas():
     """ Busines logic for areas
     """
 

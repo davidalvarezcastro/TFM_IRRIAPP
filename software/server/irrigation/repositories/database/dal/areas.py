@@ -1,10 +1,10 @@
 import typing
 
 from .interface_areas import InterfaceAreasDAL
-from domain.database.errors import DUPLICATED, GENERAL_ERROR, NOT_FOUND
-from domain.database.models import AreasORM
+from repositories.database.errors import DUPLICATED, GENERAL_ERROR, NOT_FOUND
+from repositories.database.models import AreasORM
 from domain.models.areas import Area
-from domain.exceptions.database import ExceptionDatabase
+from exceptions.database import ExceptionDatabase
 
 
 class AreasDAL(InterfaceAreasDAL):

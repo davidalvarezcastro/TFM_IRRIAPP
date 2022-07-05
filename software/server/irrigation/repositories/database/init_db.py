@@ -32,4 +32,4 @@ def init_db():
     )
 
     # import para crear las tablas
-    import domain.database.models
+    import repositories.database.models

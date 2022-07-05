@@ -1,10 +1,10 @@
 import typing
 
 from .interface_controllers import InterfaceControllersDAL
-from domain.database.errors import DUPLICATED, GENERAL_ERROR, NOT_FOUND
-from domain.database.models import ControllersORM
+from repositories.database.errors import DUPLICATED, GENERAL_ERROR, NOT_FOUND
+from repositories.database.models import ControllersORM
 from domain.models.controllers import Controller
-from domain.exceptions.database import ExceptionDatabase
+from exceptions.database import ExceptionDatabase
 
 
 class ControllersDAL(InterfaceControllersDAL):

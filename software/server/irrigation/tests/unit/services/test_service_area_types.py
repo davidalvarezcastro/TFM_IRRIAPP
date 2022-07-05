@@ -1,115 +1,111 @@
 # -*- coding: utf-8 -*-
 """
-    areas controller tests
+    area types controller tests
 """
 import os
 import unittest
 
 from unittest.mock import Mock, patch
 
-from controllers.areas import ControllerAreas
-from domain.models.areas import Area
-from domain.database.dal.areas import AreasDAL
+from application.services.area_types import ServiceAreaTypes
+from domain.models.area_types import AreaType
+from repositories.database.dal.area_types import AreaTypesDAL
 
 
 os.environ['MODE'] = "test"
 
 
 @unittest.skipUnless(os.getenv('UNIT_TESTS'), 'UNIT TEST')
-class ControllerAreasUnitTest(unittest.TestCase):
+class ServiceTypesUnitTest(unittest.TestCase):
 
-    print('ControllerAreasUnitTest...')
+    print('ServiceTypesUnitTest...')
 
     def setUp(self):
         self.id = 1
-        self.name = "name"
         self.description = "this is a dummy description"
-        self.visible = True
 
-        self.controller = ControllerAreas()
+        self.controller = ServiceAreaTypes()
 
-        self.area = Area(
+        self.type = AreaType(
             id=self.id,
             description=self.description,
-            name=self.name,
-            visible=self.visible,
         )
 
     # INNER METHODS
 
     # TESTS
-    @patch.object(AreasDAL, 'insert', return_value=True)
+    @patch.object(AreaTypesDAL, 'insert', return_value=True)
     def test_controller_insert_call_dal_insert_ok(self, mock):
         self.controller.insert(
-            area=self.area
+            type=self.type
         )
 
         mock.assert_called_once()
 
-    @patch.object(AreasDAL, 'insert')
+    @patch.object(AreaTypesDAL, 'insert')
     def test_controller_insert_raise_exception_ok(self, mock):
         mock.side_effect = Mock(
             side_effect=Exception('error'))
 
         with self.assertRaises(Exception) as context:
             self.controller.insert(
-                area=self.area
+                type=self.type
             )
 
         self.assertTrue("error" in str(context.exception))
         mock.assert_called_once()
 
-    @patch.object(AreasDAL, 'update', return_value=True)
+    @patch.object(AreaTypesDAL, 'update', return_value=True)
     def test_controller_update_call_dal_insert_ok(self, mock):
         self.controller.update(
-            area=self.area
+            type=self.type
         )
 
         mock.assert_called_once()
 
-    @patch.object(AreasDAL, 'update')
+    @patch.object(AreaTypesDAL, 'update')
     def test_controller_update_raise_exception_ok(self, mock):
         mock.side_effect = Mock(
             side_effect=Exception('error'))
 
         with self.assertRaises(Exception) as context:
             self.controller.update(
-                area=self.area
+                type=self.type
             )
 
         self.assertTrue("error" in str(context.exception))
         mock.assert_called_once()
 
-    @patch.object(AreasDAL, 'delete', return_value=True)
+    @patch.object(AreaTypesDAL, 'delete', return_value=True)
     def test_controller_delete_call_dal_insert_ok(self, mock):
         self.controller.delete(
-            area=self.area
+            type=self.type
         )
 
         mock.assert_called_once()
 
-    @patch.object(AreasDAL, 'delete')
+    @patch.object(AreaTypesDAL, 'delete')
     def test_controller_delete_raise_exception_ok(self, mock):
         mock.side_effect = Mock(
             side_effect=Exception('error'))
 
         with self.assertRaises(Exception) as context:
             self.controller.delete(
-                area=self.area
+                type=self.type
             )
 
         self.assertTrue("error" in str(context.exception))
         mock.assert_called_once()
 
-    @patch.object(AreasDAL, 'get_by_id')
+    @patch.object(AreaTypesDAL, 'get_by_id')
     def test_controller_get_id_call_dal_get_id_ok(self, mock):
         self.controller.get_by_id(
-            area=self.id
+            type=self.id
         )
 
         mock.assert_called_once()
 
-    @patch.object(AreasDAL, 'get_all')
+    @patch.object(AreaTypesDAL, 'get_all')
     def test_controller_get_all_call_dal_get_all_ok(self, mock):
         self.controller.get_all()
 

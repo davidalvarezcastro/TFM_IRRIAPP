@@ -2,11 +2,11 @@
 
 import typing
 from domain.models.area_types import AreaType
-from domain.database.dal.area_types import AreaTypesDAL
-from domain.exceptions.database import ExceptionDatabase
+from repositories.database.dal.area_types import AreaTypesDAL
+from exceptions.database import ExceptionDatabase
 
 
-class ControllerAreaTypes():
+class ServiceAreaTypes():
     """ Busines logic for area types
     """
 

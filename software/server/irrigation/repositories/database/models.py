@@ -2,8 +2,8 @@ from datetime import datetime
 from sqlalchemy import Column, Integer, SmallInteger, String, Text, TIMESTAMP, \
     ForeignKey, event, text, DDL
 
-from domain.database.data_mysql import DATA_TYPES, DATA_AREAS, DATA_CONTROLLERS
-from domain.database.database import Base, engine
+from repositories.database.data_mysql import DATA_TYPES, DATA_AREAS, DATA_CONTROLLERS
+from repositories.database.database import Base, engine
 
 
 def is_sqlite() -> bool:

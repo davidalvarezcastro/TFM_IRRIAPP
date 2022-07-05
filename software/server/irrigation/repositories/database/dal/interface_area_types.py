@@ -2,8 +2,8 @@ import typing
 from abc import ABC, abstractmethod
 
 from domain.models.area_types import AreaType
-from domain.exceptions.general import NotImplementedError
-from domain.exceptions.database import ExceptionDatabase
+from exceptions.general import NotImplementedError
+from exceptions.database import ExceptionDatabase
 
 
 class InterfaceAreaTypesDAL(ABC):

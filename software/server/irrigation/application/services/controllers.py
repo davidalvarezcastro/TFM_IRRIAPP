@@ -2,11 +2,11 @@
 
 import typing
 from domain.models.controllers import Controller
-from domain.database.dal.controllers import ControllersDAL
-from domain.exceptions.database import ExceptionDatabase
+from repositories.database.dal.controllers import ControllersDAL
+from exceptions.database import ExceptionDatabase
 
 
-class ControllerControllers():
+class ServiceControllers():
     """ Busines logic for controllers
     """
 
