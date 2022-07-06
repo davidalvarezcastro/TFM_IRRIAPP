@@ -10,7 +10,7 @@ from globals import TIMEOUT, BACKOFF_FACTOR, REINTENTOS, FORMAT_DATES
 # load_dotenv()  # loading env variables
 
 # loading env without altering the environment
-if os.getenv('MODE') == 'test':
+if os.getenv('MODE') == 'test' and os.getenv('UNIT_TESTS', None) is None:
     env = dotenv_values('.env_testing')
 else:
     env = dotenv_values()

@@ -4,5 +4,5 @@ import attr
 
 @attr.s
 class AreaType():
-    id: int = attr.ib()
-    description: str = attr.ib(default=None)
+    description: str = attr.ib()
+    id: int = attr.ib(default=-1)

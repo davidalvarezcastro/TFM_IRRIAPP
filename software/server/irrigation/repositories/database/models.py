@@ -1,4 +1,3 @@
-from datetime import datetime
 from sqlalchemy import Column, Integer, SmallInteger, String, Text, TIMESTAMP, \
     ForeignKey, event, text, DDL
 
@@ -144,5 +143,5 @@ event.listen(
     trigger_update_visible.execute_if(dialect=('postgresql', 'mysql'))
 )
 
-# creación de las tablas
+# tables creation
 Base.metadata.create_all(bind=engine)
