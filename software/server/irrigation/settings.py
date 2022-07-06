@@ -8,7 +8,12 @@ from globals import TIMEOUT, BACKOFF_FACTOR, REINTENTOS, FORMAT_DATES
 
 
 # load_dotenv()  # loading env variables
-env = dotenv_values()  # loading env without altering the environment
+
+# loading env without altering the environment
+if os.getenv('MODE') == 'test':
+    env = dotenv_values('.env_testing')
+else:
+    env = dotenv_values()
 
 # To specify messages' topics => domain/messages/topics.py
 # To specify observer events' topic => domain/observer/topics.py

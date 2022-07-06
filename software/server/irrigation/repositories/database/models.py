@@ -75,7 +75,7 @@ class ControllersORM(Base):
         'table to save the controller set from a specific area'}
 
     id = Column(Integer, primary_key=True)
-    area = Column(Integer, ForeignKey('areas.id'), primary_key=True)
+    area = Column(Integer, ForeignKey('areas.id', ondelete='CASCADE', onupdate='CASCADE'), primary_key=True)
     name = Column(String(25), nullable=False)
     description = Column(Text, nullable=True)
     key = Column(String(128), nullable=True)

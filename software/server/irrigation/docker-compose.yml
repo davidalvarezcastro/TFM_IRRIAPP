@@ -2,15 +2,23 @@ version: "2.3"
 
 services:
 
+  database_testing:
+    image: mariadb:10.7.4
+    container_name: database_testing
+    environment:
+      - TZ=Europe/Madrid
+      - MYSQL_ROOT_PASSWORD=user
+      - MYSQL_DATABASE=irrigation_database_testing
+      - MYSQL_USER=user
+      - MYSQL_PASSWORD=user
+    ports:
+      - 3309:3306
+
   broker_testing:
     image: eclipse-mosquitto
-    container_name: irrigation_broker_testing
-    restart: always
+    container_name: broker_testing
     volumes:
-      - ../config/mosquitto/mosquitto.conf:/mosquitto/config/mosquitto.conf
-      - ../config/mosquitto/mosquitto_passwd:/mosquitto/config/pwfile
+      - ./config/mosquitto/mosquitto.conf:/mosquitto/config/mosquitto.conf
     ports:
-      - ${BROKER_PORT_BINDED:-1883}:${BROKER_PORT:-1883}
-      - ${BROKER_WEBPORT_BINDED:-8884}:${BROKER_WEBPORT:-8884}
-    logging:
-      driver: none
+      - 1886:1883
+      - 8888:8884

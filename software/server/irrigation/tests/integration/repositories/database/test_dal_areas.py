@@ -2,13 +2,8 @@
 """
     areas dal tests
 """
-import datetime
-import json
 import os
-import time
 import unittest
-
-from unittest.mock import Mock, patch
 
 from exceptions.database import ExceptionDatabase
 from domain.models.areas import Area
@@ -46,162 +41,180 @@ class DALAreasIntegrationTest(unittest.TestCase):
             visible=self.visible,
         )
 
+        # clean data table
+        AreasORM.query.delete()
+
     # INNER METHODS
 
     # TESTS
-    @patch.object(AreasORM, 'add', return_value=True)
-    @patch('repositories.database.models.AreasORM.query')
-    def test_insert_call_add_db_function_ok(self, mockFilter, mock):
-        mockFilter.filter_by.return_value.first.return_value = None
+    def test_insert_function_add_element_database_ok(self):
+        expected_previous = AreasORM.query.filter_by(id=self.area.id).first()
 
         self.dal.insert(
             area=self.area
         )
 
-        mock.assert_called_once()
+        expected = AreasORM.query.filter_by(id=self.area.id).first()
+        self.assertIsNone(expected_previous)
+        self.assertIsNotNone(expected)
+        self.assertEqual(expected.id, self.area.id)
+        self.assertEqual(expected.description, self.description)
+        self.assertEqual(expected.name, self.name)
 
-    @patch.object(AreasORM, 'add')
-    @patch('repositories.database.models.AreasORM.query')
-    def test_insert_call_add_db_function_raise_exception_ok(self, mockFilter, mock):
-        mock.side_effect = Mock(
-            side_effect=Exception('error'))
-        mockFilter.filter_by.return_value.first.return_value = None
-
-        with self.assertRaises(ExceptionDatabase) as context:
-            self.dal.insert(
-                area=self.area
-            )
-
-        self.assertTrue("error" in str(context.exception))
-        mock.assert_called_once()
-
-    @patch.object(AreasORM, 'add', return_value=True)
-    @patch('repositories.database.models.AreasORM.query')
-    def test_insert_raise_exception_duplicated_type_ok(self, mockFilter, mock):
-        mockFilter.filter_by.return_value.first.return_value = self.area_db
+    def test_insert_function_raise_exception_duplicated_element_ok(self):
+        self.area_db.add()
 
         with self.assertRaises(ExceptionDatabase) as context:
             self.dal.insert(
                 area=self.area
             )
 
+        expected = AreasORM.query.filter_by(id=self.area.id).first()
         self.assertTrue(f"Area {self.area.id} duplicated!" in str(context.exception))
+        self.assertIsNotNone(expected)
 
-        mock.assert_not_called()
+    def test_update_function_update_element_database_ok(self):
+        description = "new description"
+        active = 0
+        name = "test_name"
+        self.area_db.add()
 
-    @patch.object(AreasORM, 'update', return_value=True)
-    @patch('repositories.database.models.AreasORM.query')
-    def test_update_call_update_db_function_ok(self, mockFilter, mock):
-        mockFilter.filter_by.return_value.first.return_value = self.area_db
-
+        self.area.description = description
+        self.area.visible = active
+        self.area.name = name
         self.dal.update(
             area=self.area
         )
 
-        mock.assert_called_once()
+        expected = AreasORM.query.filter_by(id=self.area.id).first()
+        self.assertIsNotNone(expected)
+        self.assertEqual(expected.id, self.area.id)
+        self.assertEqual(expected.description, description)
+        self.assertEqual(expected.visible, active)
+        self.assertEqual(expected.name, name)
 
-    @patch.object(AreasORM, 'update')
-    @patch('repositories.database.models.AreasORM.query')
-    def test_update_call_update_db_function_raise_exception_ok(self, mockFilter, mock):
-        mock.side_effect = Mock(
-            side_effect=Exception('error'))
-        mockFilter.filter_by.return_value.first.return_value = self.area_db
-
+    def test_update_function_raise_exception_element_none_ok(self):
         with self.assertRaises(ExceptionDatabase) as context:
             self.dal.update(
                 area=self.area
             )
 
-        self.assertTrue("error" in str(context.exception))
-        mock.assert_called_once()
-
-    @patch.object(AreasORM, 'add', return_value=True)
-    @patch('repositories.database.models.AreasORM.query')
-    def test_update_raise_exception_no_type_saved_ok(self, mockFilter, mock):
-        mockFilter.filter_by.return_value.first.return_value = None
-
-        with self.assertRaises(ExceptionDatabase) as context:
-            self.dal.update(
-                area=self.area
-            )
-
+        expected = AreasORM.query.filter_by(id=self.area.id).first()
         self.assertTrue(f"Area {self.area.id} is not saved!" in str(context.exception))
+        self.assertIsNone(expected)
 
-        mock.assert_not_called()
+    def test_delete_function_remove_element_database_ok(self):
+        self.area_db.add()
 
-    @patch.object(AreasORM, 'delete', return_value=True)
-    @patch('repositories.database.models.AreasORM.query')
-    def test_delete_call_delete_db_function_ok(self, mockFilter, mock):
-        mockFilter.filter_by.return_value.first.return_value = self.area_db
+        expected_previous = AreasORM.query.filter_by(id=self.area.id).first()
 
         self.dal.delete(
             area=self.area
         )
 
-        mock.assert_called_once()
+        expected = AreasORM.query.filter_by(id=self.area.id).first()
+        self.assertIsNotNone(expected_previous)
+        self.assertIsNone(expected)
 
-    @patch.object(AreasORM, 'delete')
-    @patch('repositories.database.models.AreasORM.query')
-    def test_delete_call_detele_db_function_raise_exception_ok(self, mockFilter, mock):
-        mock.side_effect = Mock(
-            side_effect=Exception('error'))
-        mockFilter.filter_by.return_value.first.return_value = None
+    def test_get_id_function_return_element_by_id_ok(self):
+        self.area_db.add()
 
-        with self.assertRaises(ExceptionDatabase) as context:
-            self.dal.delete(
-                area=self.area
-            )
-
-        self.assertTrue("error" in str(context.exception))
-        mock.assert_not_called()
-
-    @patch.object(AreasDAL, 'init_from_orm_to_model')
-    @patch('repositories.database.models.AreasORM.query')
-    def test_get_id_call_format_inner_function_ok(self, mockFilter, mock):
-        mockFilter.filter_by.return_value.first.return_value = self.area_db
-
-        self.dal.get_by_id(
-            area=self.id
+        result = self.dal.get_by_id(
+            area=self.area_db.id
         )
 
-        mock.assert_called_once()
+        self.assertIsNotNone(result)
+        self.assertEqual(result.id, self.area_db.id)
+        self.assertEqual(result.description, self.area_db.description)
+        self.assertEqual(result.name, self.area_db.name)
 
-    @patch.object(AreasDAL, 'init_from_orm_to_model')
-    @patch('repositories.database.models.AreasORM.query')
-    def test_get_id_returns_none_ok(self, mockFilter, mock):
-        mockFilter.filter_by.return_value.first.return_value = None
+    def test_get_id_function_not_return_element_not_visible_ok(self):
+        self.area_db = AreasORM(
+            id=self.id,
+            description=self.description,
+            name=self.name,
+            visible=False,
+        )
+
+        self.area_db.add()
+
+        result = self.dal.get_by_id(
+            area=self.area_db.id,
+            all_visibility=False
+        )
+
+        self.assertIsNone(result)
+
+    def test_get_id_function_return_element_not_visible_ok(self):
+        self.area_db.visible = False
+        self.area_db.add()
+
+        result = self.dal.get_by_id(
+            area=self.area_db.id,
+            all_visibility=True
+        )
+
+        self.assertIsNotNone(result)
+        self.assertEqual(result.id, self.area_db.id)
+        self.assertEqual(result.description, self.area_db.description)
+        self.assertEqual(result.name, self.area_db.name)
+
+    def test_get_id_function_return_none_ok(self):
+        self.area_db.add()
+        self.id = 3
 
         result = self.dal.get_by_id(
             area=self.id
         )
 
         self.assertIsNone(result)
-        mock.assert_not_called()
 
-    @patch('repositories.database.models.AreasORM.query')
-    def test_get_all_returns_array_ok(self, mockFilter):
-        mockFilter.filter_by.return_value.all.return_value = [self.area_db]
+    def test_get_all_function_return_array_all_visibility_ok(self):
+        self.area_db.add()
+        self.id = 2
+        self.description = "description 2"
+        self.name = "testing"
+        self.area_db = AreasORM(
+            id=self.id,
+            description=self.description,
+            name=self.name,
+        )
+        self.area_db.add()
 
+        result = self.dal.get_all(
+            all_visibility=True
+        )
+
+        self.assertIsNotNone(result)
+        self.assertTrue(len(result) == 2)
+
+    def test_get_all_function_return_array_only_visible_ok(self):
+        self.area_db.add()
+        self.id = 2
+        self.description = "description 2"
+        self.name = "testing"
+        area_db = AreasORM(
+            id=self.id,
+            description=self.description,
+            name=self.name,
+            visible=False
+        )
+        area_db.add()
+
+        result = self.dal.get_all(
+            all_visibility=False
+        )
+
+        self.assertIsNotNone(result)
+        self.assertTrue(len(result) == 1)
+
+    def test_get_all_function_return_empty_array_ok(self):
+        expected = []
         result = self.dal.get_all()
-        expected = [
-            Area(
-                id=self.area_db.id,
-                description=self.area_db.description,
-                name=self.area_db.name,
-                visible=self.area_db.visible,
-                date=self.area_db.date
-            )
-        ]
 
-        self.assertEqual(result, expected)
-
-    @patch('repositories.database.models.AreasORM.query')
-    def test_get_all_returns_empty_array_ok(self, mockFilter):
-        mockFilter.filter_by.return_value.all.return_value = []
-
-        result = self.dal.get_all()
-
+        self.assertIsNotNone(result)
         self.assertTrue(len(result) == 0)
+        self.assertEqual(result, expected)
 
 
 if __name__ == '__main__':

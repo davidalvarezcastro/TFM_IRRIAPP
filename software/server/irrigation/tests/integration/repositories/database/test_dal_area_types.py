@@ -5,8 +5,6 @@
 import os
 import unittest
 
-from unittest.mock import Mock, patch
-
 from exceptions.database import ExceptionDatabase
 from repositories.database.models import TypesORM
 from domain.models.area_types import AreaType
@@ -37,158 +35,126 @@ class DALTypesIntegrationTest(unittest.TestCase):
             description=self.description,
         )
 
+        # clean data table
+        TypesORM.query.delete()
+
     # INNER METHODS
 
     # TESTS
-    @patch.object(TypesORM, 'add', return_value=True)
-    @patch('repositories.database.models.TypesORM.query')
-    def test_insert_call_add_db_function_ok(self, mockFilter, mock):
-        mockFilter.filter_by.return_value.first.return_value = None
+    def test_insert_function_add_element_database_ok(self):
+        expected_previous = TypesORM.query.filter_by(id=self.type.id).first()
 
         self.dal.insert(
             type=self.type
         )
 
-        mock.assert_called_once()
+        expected = TypesORM.query.filter_by(id=self.type.id).first()
+        self.assertIsNone(expected_previous)
+        self.assertIsNotNone(expected)
+        self.assertEqual(expected.id, self.type.id)
+        self.assertEqual(expected.description, self.description)
 
-    @patch.object(TypesORM, 'add')
-    @patch('repositories.database.models.TypesORM.query')
-    def test_insert_call_add_db_function_raise_exception_ok(self, mockFilter, mock):
-        mock.side_effect = Mock(
-            side_effect=Exception('error'))
-        mockFilter.filter_by.return_value.first.return_value = None
-
-        with self.assertRaises(ExceptionDatabase) as context:
-            self.dal.insert(
-                type=self.type
-            )
-
-        self.assertTrue("error" in str(context.exception))
-        mock.assert_called_once()
-
-    @patch.object(TypesORM, 'add', return_value=True)
-    @patch('repositories.database.models.TypesORM.query')
-    def test_insert_raise_exception_duplicated_type_ok(self, mockFilter, mock):
-        mockFilter.filter_by.return_value.first.return_value = self.type_db
+    def test_insert_function_raise_exception_duplicated_element_ok(self):
+        self.type_db.add()
 
         with self.assertRaises(ExceptionDatabase) as context:
             self.dal.insert(
                 type=self.type
             )
 
+        expected = TypesORM.query.filter_by(id=self.type.id).first()
         self.assertTrue(f"Type {self.type.id} duplicated!" in str(context.exception))
+        self.assertIsNotNone(expected)
 
-        mock.assert_not_called()
+    def test_update_function_update_element_database_ok(self):
+        description = "new description"
+        self.type_db.add()
 
-    @patch.object(TypesORM, 'update', return_value=True)
-    @patch('repositories.database.models.TypesORM.query')
-    def test_update_call_update_db_function_ok(self, mockFilter, mock):
-        mockFilter.filter_by.return_value.first.return_value = self.type_db
-
+        self.type.description = description
         self.dal.update(
             type=self.type
         )
 
-        mock.assert_called_once()
+        expected = TypesORM.query.filter_by(id=self.type.id).first()
+        self.assertIsNotNone(expected)
+        self.assertEqual(expected.id, self.type.id)
+        self.assertEqual(expected.description, description)
 
-    @patch.object(TypesORM, 'update')
-    @patch('repositories.database.models.TypesORM.query')
-    def test_update_call_update_db_function_raise_exception_ok(self, mockFilter, mock):
-        mock.side_effect = Mock(
-            side_effect=Exception('error'))
-        mockFilter.filter_by.return_value.first.return_value = self.type_db
-
+    def test_update_function_raise_exception_element_none_ok(self):
         with self.assertRaises(ExceptionDatabase) as context:
             self.dal.update(
                 type=self.type
             )
 
-        self.assertTrue("error" in str(context.exception))
-        mock.assert_called_once()
-
-    @patch.object(TypesORM, 'add', return_value=True)
-    @patch('repositories.database.models.TypesORM.query')
-    def test_update_raise_exception_no_type_saved_ok(self, mockFilter, mock):
-        mockFilter.filter_by.return_value.first.return_value = None
-
-        with self.assertRaises(ExceptionDatabase) as context:
-            self.dal.update(
-                type=self.type
-            )
-
+        expected = TypesORM.query.filter_by(id=self.type.id).first()
         self.assertTrue(f"Type {self.type.id} is not saved!" in str(context.exception))
+        self.assertIsNone(expected)
 
-        mock.assert_not_called()
+    def test_delete_function_remove_element_database_ok(self):
+        self.type_db.add()
 
-    @patch.object(TypesORM, 'delete', return_value=True)
-    @patch('repositories.database.models.TypesORM.query')
-    def test_delete_call_delete_db_function_ok(self, mockFilter, mock):
-        mockFilter.filter_by.return_value.first.return_value = self.type_db
+        expected_previous = TypesORM.query.filter_by(id=self.type.id).first()
 
         self.dal.delete(
             type=self.type
         )
 
-        mock.assert_called_once()
+        expected = TypesORM.query.filter_by(id=self.type.id).first()
+        self.assertIsNotNone(expected_previous)
+        self.assertIsNone(expected)
 
-    @patch.object(TypesORM, 'delete')
-    @patch('repositories.database.models.TypesORM.query')
-    def test_delete_call_detele_db_function_raise_exception_ok(self, mockFilter, mock):
-        mock.side_effect = Mock(
-            side_effect=Exception('error'))
-        mockFilter.filter_by.return_value.first.return_value = None
+    def test_get_id_function_return_element_by_id_ok(self):
+        self.type_db.add()
 
-        with self.assertRaises(ExceptionDatabase) as context:
-            self.dal.delete(
-                type=self.type
-            )
+        expected_id = self.type_db.id
+        expected_description = self.type_db.description
 
-        self.assertTrue("error" in str(context.exception))
-        mock.assert_not_called()
-
-    @patch.object(AreaTypesDAL, 'init_from_orm_to_model')
-    @patch('repositories.database.models.TypesORM.query')
-    def test_get_id_call_format_inner_function_ok(self, mockFilter, mock):
-        mockFilter.filter_by.return_value.first.return_value = self.type_db
-
-        self.dal.get_by_id(
-            type=self.id
+        self.id = 3
+        self.description = "new area type"
+        self.type_db = TypesORM(
+            id=self.id,
+            description=self.description,
         )
 
-        mock.assert_called_once()
+        self.type_db.add()
 
-    @patch.object(AreaTypesDAL, 'init_from_orm_to_model')
-    @patch('repositories.database.models.TypesORM.query')
-    def test_get_id_returns_none_ok(self, mockFilter, mock):
-        mockFilter.filter_by.return_value.first.return_value = None
+        result = self.dal.get_by_id(
+            type=expected_id
+        )
+
+        self.assertIsNotNone(result)
+        self.assertEqual(result.id, expected_id)
+        self.assertEqual(result.description, expected_description)
+
+    def test_get_id_function_return_none_ok(self):
+        self.type_db.add()
+        self.id = 3
 
         result = self.dal.get_by_id(
             type=self.id
         )
 
         self.assertIsNone(result)
-        mock.assert_not_called()
 
-    @patch('repositories.database.models.TypesORM.query')
-    def test_get_all_returns_array_ok(self, mockFilter):
-        mockFilter.filter.return_value.all.return_value = [self.type_db]
-
-        result = self.dal.get_all()
-        expected = [
-            AreaType(
-                id=self.type_db.id,
-                description=self.type_db.description,
-            )
-        ]
-
-        self.assertEqual(result, expected)
-
-    @patch('repositories.database.models.TypesORM.query')
-    def test_get_all_returns_empty_array_ok(self, mockFilter):
-        mockFilter.filter.return_value.all.return_value = []
+    def test_get_all_function_return_array_ok(self):
+        self.type_db.add()
+        self.id = 2
+        self.description = "description 2"
+        self.type_db = TypesORM(
+            id=self.id,
+            description=self.description,
+        )
+        self.type_db.add()
 
         result = self.dal.get_all()
 
+        self.assertIsNotNone(result)
+        self.assertTrue(len(result) == 2)
+
+    def test_get_all_function_return_empty_array_ok(self):
+        result = self.dal.get_all()
+
+        self.assertIsNotNone(result)
         self.assertTrue(len(result) == 0)
 
 
