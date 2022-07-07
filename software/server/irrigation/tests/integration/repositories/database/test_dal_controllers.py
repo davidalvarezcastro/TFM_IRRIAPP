@@ -70,13 +70,36 @@ class DALControllersIntegrationTest(unittest.TestCase):
     def test_insert_function_add_element_database_ok(self):
         expected_previous = ControllersORM.query.filter_by(id=self.controller.id).first()
 
-        self.dal.insert(
+        controller_id = self.dal.insert(
             controller=self.controller
         )
 
         expected = ControllersORM.query.filter_by(id=self.controller.id).first()
         self.assertIsNone(expected_previous)
         self.assertIsNotNone(expected)
+        self.assertEqual(controller_id, self.controller.id)
+        self.assertEqual(expected.id, self.controller.id)
+        self.assertEqual(expected.description, self.description)
+        self.assertEqual(expected.name, self.name)
+
+    def test_insert_function_add_element_database_return_new_id_ok(self):
+        expected_previous = ControllersORM.query.filter_by(id=self.controller.id).first()
+        self.controller = Controller(
+            area=self.area,
+            description=self.description,
+            key=self.key,
+            name=self.name,
+            visible=self.visible,
+        )
+
+        controller_id = self.dal.insert(
+            controller=self.controller
+        )
+
+        expected = ControllersORM.query.filter_by(id=self.controller.id).first()
+        self.assertIsNone(expected_previous)
+        self.assertIsNotNone(expected)
+        self.assertEqual(controller_id, self.controller.id)
         self.assertEqual(expected.id, self.controller.id)
         self.assertEqual(expected.description, self.description)
         self.assertEqual(expected.name, self.name)

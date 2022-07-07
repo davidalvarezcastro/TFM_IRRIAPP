@@ -44,13 +44,31 @@ class DALTypesIntegrationTest(unittest.TestCase):
     def test_insert_function_add_element_database_ok(self):
         expected_previous = TypesORM.query.filter_by(id=self.type.id).first()
 
-        self.dal.insert(
+        type_id = self.dal.insert(
             type=self.type
         )
 
         expected = TypesORM.query.filter_by(id=self.type.id).first()
         self.assertIsNone(expected_previous)
         self.assertIsNotNone(expected)
+        self.assertEqual(type_id, self.type.id)
+        self.assertEqual(expected.id, self.type.id)
+        self.assertEqual(expected.description, self.description)
+
+    def test_insert_function_add_element_database_return_new_id_ok(self):
+        expected_previous = TypesORM.query.filter_by(id=self.type.id).first()
+        self.type = AreaType(
+            description=self.description,
+        )
+
+        type_id = self.dal.insert(
+            type=self.type
+        )
+
+        expected = TypesORM.query.filter_by(id=self.type.id).first()
+        self.assertIsNone(expected_previous)
+        self.assertIsNotNone(expected)
+        self.assertEqual(type_id, self.type.id)
         self.assertEqual(expected.id, self.type.id)
         self.assertEqual(expected.description, self.description)
 

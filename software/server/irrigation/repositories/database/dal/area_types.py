@@ -17,7 +17,7 @@ class AreaTypesDAL(InterfaceAreaTypesDAL):
         )
 
     @staticmethod
-    def insert(type: AreaType) -> ExceptionDatabase:
+    def insert(type: AreaType) -> typing.Tuple[int, ExceptionDatabase]:
         aux = TypesORM.query.filter_by(id=type.id).first()
         if aux is not None:
             raise ExceptionDatabase(type=DUPLICATED, msg=f"Type {type.id} duplicated!")
@@ -29,6 +29,8 @@ class AreaTypesDAL(InterfaceAreaTypesDAL):
 
         try:
             typeDB.add()
+            typeDB.refresh()
+            return typeDB.id
         except Exception as e:
             raise ExceptionDatabase(type=GENERAL_ERROR, msg=str(e))
 

@@ -10,8 +10,8 @@ class ServiceControllers():
     """ Busines logic for controllers
     """
 
-    def insert(self, controller: Controller) -> ExceptionDatabase:
-        ControllersDAL.insert(controller=controller)
+    def insert(self, controller: Controller) -> typing.Tuple[int, ExceptionDatabase]:
+        return ControllersDAL.insert(controller=controller)
 
     def update(self, controller: Controller) -> ExceptionDatabase:
         ControllersDAL.update(controller=controller)

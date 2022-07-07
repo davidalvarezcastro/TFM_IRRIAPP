@@ -50,15 +50,17 @@ class DALAreasUnitTest(unittest.TestCase):
 
     # TESTS
     @patch.object(AreasORM, 'add', return_value=True)
+    @patch.object(AreasORM, 'refresh', return_value=True)
     @patch('repositories.database.models.AreasORM.query')
-    def test_insert_call_add_db_function_ok(self, mockFilter, mock):
+    def test_insert_call_add_db_function_ok(self, mockFilter, mockRefresh, mock):
         mockFilter.filter_by.return_value.first.return_value = None
 
-        self.dal.insert(
+        area_id = self.dal.insert(
             area=self.area
         )
 
         mock.assert_called_once()
+        self.assertEqual(area_id, self.area.id)
 
     @patch.object(AreasORM, 'add')
     @patch('repositories.database.models.AreasORM.query')

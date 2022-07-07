@@ -17,20 +17,42 @@ db_session = get_new_connection()
 
 
 def add(self):
-    # db_session = get_new_connection()
-    db_session.add(self)
-    db_session.commit()
+    try:
+        # db_session = get_new_connection()
+        db_session.add(self)
+        db_session.commit()
+    except Exception:
+        db_session.rollback()
+        raise
 
 
 def update(self):
-    # db_session = get_new_connection()
-    db_session.commit()
+    try:
+        # db_session = get_new_connection()
+        db_session.commit()
+    except Exception:
+        db_session.rollback()
+        raise
 
 
 def delete(self):
-    # db_session = get_new_connection()
-    db_session.delete(self)
-    db_session.commit()
+    try:
+        # db_session = get_new_connection()
+        db_session.delete(self)
+        db_session.commit()
+    except Exception:
+        db_session.rollback()
+        raise
+
+
+def refresh(self):
+    try:
+        # db_session = get_new_connection()
+        db_session.refresh(self)
+        db_session.commit()
+    except Exception:
+        db_session.rollback()
+        raise
 
 
 def query(self):
@@ -43,3 +65,4 @@ Base.query = db_session.query_property()
 Base.add = add
 Base.delete = delete
 Base.update = update
+Base.refresh = refresh

@@ -41,15 +41,17 @@ class DALTypesUnitTest(unittest.TestCase):
 
     # TESTS
     @patch.object(TypesORM, 'add', return_value=True)
+    @patch.object(TypesORM, 'refresh', return_value=True)
     @patch('repositories.database.models.TypesORM.query')
-    def test_insert_call_add_db_function_ok(self, mockFilter, mock):
+    def test_insert_call_add_db_function_ok(self, mockFilter, mockRefresh, mock):
         mockFilter.filter_by.return_value.first.return_value = None
 
-        self.dal.insert(
+        type_id = self.dal.insert(
             type=self.type
         )
 
         mock.assert_called_once()
+        self.assertEqual(type_id, self.type.id)
 
     @patch.object(TypesORM, 'add')
     @patch('repositories.database.models.TypesORM.query')

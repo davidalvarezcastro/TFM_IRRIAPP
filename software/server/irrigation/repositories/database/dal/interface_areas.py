@@ -9,7 +9,7 @@ from exceptions.database import ExceptionDatabase
 class InterfaceAreasDAL(ABC):
 
     @abstractmethod
-    def insert(area: Area) -> ExceptionDatabase:
+    def insert(area: Area) -> typing.Tuple[int, ExceptionDatabase]:
         raise NotImplementedError
 
     @abstractmethod

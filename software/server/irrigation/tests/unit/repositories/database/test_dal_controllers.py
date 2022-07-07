@@ -56,15 +56,17 @@ class DALControllersUnitTest(unittest.TestCase):
 
     # TESTS
     @patch.object(ControllersORM, 'add', return_value=True)
+    @patch.object(ControllersORM, 'refresh', return_value=True)
     @patch('repositories.database.models.ControllersORM.query')
-    def test_insert_call_add_db_function_ok(self, mockFilter, mock):
+    def test_insert_call_add_db_function_ok(self, mockFilter, mockRefresh, mock):
         mockFilter.filter_by.return_value.first.return_value = None
 
-        self.dal.insert(
+        controller_id = self.dal.insert(
             controller=self.controller
         )
 
         mock.assert_called_once()
+        self.assertEqual(controller_id, self.controller.id)
 
     @patch.object(ControllersORM, 'add')
     @patch('repositories.database.models.ControllersORM.query')

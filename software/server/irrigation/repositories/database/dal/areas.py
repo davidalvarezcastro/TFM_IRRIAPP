@@ -20,7 +20,7 @@ class AreasDAL(InterfaceAreasDAL):
         )
 
     @staticmethod
-    def insert(area: Area) -> ExceptionDatabase:
+    def insert(area: Area) -> typing.Tuple[int, ExceptionDatabase]:
         aux = AreasORM.query.filter_by(id=area.id).first()
         if aux is not None:
             raise ExceptionDatabase(type=DUPLICATED, msg=f"Area {area.id} duplicated!")
@@ -34,6 +34,8 @@ class AreasDAL(InterfaceAreasDAL):
 
         try:
             areaDB.add()
+            areaDB.refresh()
+            return areaDB.id
         except Exception as e:
             raise ExceptionDatabase(type=GENERAL_ERROR, msg=str(e))
 

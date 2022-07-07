@@ -50,13 +50,35 @@ class DALAreasIntegrationTest(unittest.TestCase):
     def test_insert_function_add_element_database_ok(self):
         expected_previous = AreasORM.query.filter_by(id=self.area.id).first()
 
-        self.dal.insert(
+        self.area = Area(
+            description=self.description,
+            name=self.name,
+            visible=self.visible,
+        )
+
+        area_id = self.dal.insert(
             area=self.area
         )
 
         expected = AreasORM.query.filter_by(id=self.area.id).first()
         self.assertIsNone(expected_previous)
         self.assertIsNotNone(expected)
+        self.assertEqual(area_id, self.area.id)
+        self.assertEqual(expected.id, self.area.id)
+        self.assertEqual(expected.description, self.description)
+        self.assertEqual(expected.name, self.name)
+
+    def test_insert_function_add_element_database_return_new_id_ok(self):
+        expected_previous = AreasORM.query.filter_by(id=self.area.id).first()
+
+        area_id = self.dal.insert(
+            area=self.area
+        )
+
+        expected = AreasORM.query.filter_by(id=self.area.id).first()
+        self.assertIsNone(expected_previous)
+        self.assertIsNotNone(expected)
+        self.assertEqual(area_id, self.area.id)
         self.assertEqual(expected.id, self.area.id)
         self.assertEqual(expected.description, self.description)
         self.assertEqual(expected.name, self.name)

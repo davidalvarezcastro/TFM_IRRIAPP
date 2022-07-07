@@ -9,7 +9,7 @@ from exceptions.database import ExceptionDatabase
 class InterfaceControllersDAL(ABC):
 
     @abstractmethod
-    def insert(controller: Controller) -> ExceptionDatabase:
+    def insert(controller: Controller) -> typing.Tuple[int, ExceptionDatabase]:
         raise NotImplementedError
 
     @abstractmethod

@@ -22,7 +22,7 @@ class ControllersDAL(InterfaceControllersDAL):
         )
 
     @staticmethod
-    def insert(controller: Controller) -> ExceptionDatabase:
+    def insert(controller: Controller) -> typing.Tuple[int, ExceptionDatabase]:
         aux = ControllersORM.query.filter_by(id=controller.id).first()
         if aux is not None:
             raise ExceptionDatabase(type=DUPLICATED, msg=f"Controller {controller.id} duplicated!")
@@ -38,6 +38,8 @@ class ControllersDAL(InterfaceControllersDAL):
 
         try:
             controllerDB.add()
+            controllerDB.refresh()
+            return controllerDB.id
         except Exception as e:
             raise ExceptionDatabase(type=GENERAL_ERROR, msg=str(e))
 

@@ -10,8 +10,8 @@ class ServiceAreas():
     """ Busines logic for areas
     """
 
-    def insert(self, area: Area) -> ExceptionDatabase:
-        AreasDAL.insert(area=area)
+    def insert(self, area: Area) -> typing.Tuple[int, ExceptionDatabase]:
+        return AreasDAL.insert(area=area)
 
     def update(self, area: Area) -> ExceptionDatabase:
         AreasDAL.update(area=area)
