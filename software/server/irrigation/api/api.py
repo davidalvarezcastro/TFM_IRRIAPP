@@ -6,7 +6,8 @@ from flask_cors import CORS
 from utils import Log
 from api.settings import API_PREFIX
 from api.endpoints import init
-from domain.database.init_db import init_db
+from api.endpoints import area_types
+from repositories.database.init_db import init_db
 
 
 _LOGGER = Log(logger=logging.getLogger('irrigation'))
@@ -23,6 +24,7 @@ init_db()
 # blueprints
 bp = Blueprint('api', __name__, url_prefix=API_PREFIX)  # api's blueprint
 bp.register_blueprint(init.blueprint)
+bp.register_blueprint(area_types.blueprint)
 app.register_blueprint(bp)
 
 # cors
