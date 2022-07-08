@@ -85,6 +85,7 @@ class DALControllersIntegrationTest(unittest.TestCase):
     def test_insert_function_add_element_database_return_new_id_ok(self):
         expected_previous = ControllersORM.query.filter_by(id=self.controller.id).first()
         self.controller = Controller(
+            id=1,
             area=self.area,
             description=self.description,
             key=self.key,

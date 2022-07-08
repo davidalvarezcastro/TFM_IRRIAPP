@@ -10,7 +10,7 @@ from globals import TIMEOUT, BACKOFF_FACTOR, REINTENTOS, FORMAT_DATES
 # load_dotenv()  # loading env variables
 
 # loading env without altering the environment
-if os.getenv('MODE') == 'test' and os.getenv('UNIT_TESTS', None) is None:
+if os.getenv('MODE') == 'test' and (os.getenv('INTEGRATION_TESTS', None) is not None):
     env = dotenv_values('.env_testing')
 else:
     env = dotenv_values()
@@ -27,6 +27,8 @@ API_HOST = env.get('API_HOST', '0.0.0.0')
 API_PORT = int(env.get('API_PORT', 5000))
 
 # DATABASES
+print(env.get('DB_DATABASE_IRRIGATION'))
+print(env.get('DB_DATABASE_IRRIGATION', 'irrigation'))
 
 
 class DBMySQLSettings():

@@ -51,6 +51,7 @@ class DALAreasIntegrationTest(unittest.TestCase):
         expected_previous = AreasORM.query.filter_by(id=self.area.id).first()
 
         self.area = Area(
+            id=1,
             description=self.description,
             name=self.name,
             visible=self.visible,
