@@ -25,45 +25,45 @@ class AreasDAL(InterfaceAreasDAL):
         if aux is not None:
             raise ExceptionDatabase(type=DUPLICATED, msg=f"Area {area.id} duplicated!")
 
-        areaDB = AreasORM(
+        area_db = AreasORM(
             name=area.name,
             description=area.description,
             visible=area.visible
         )
 
         if area.id != -1:
-            areaDB.id = area.id
+            area_db.id = area.id
 
         try:
-            areaDB.add()
-            areaDB.refresh()
-            return areaDB.id
+            area_db.add()
+            area_db.refresh()
+            return area_db.id
         except Exception as e:
             raise ExceptionDatabase(type=GENERAL_ERROR, msg=str(e))
 
     @staticmethod
     def update(area: Area) -> ExceptionDatabase:
-        areaDB = AreasORM.query.filter_by(id=area.id).first()
+        area_db = AreasORM.query.filter_by(id=area.id).first()
 
-        if areaDB is None:
+        if area_db is None:
             raise ExceptionDatabase(type=NOT_FOUND, msg=f"Area {area.id} is not saved!")
 
         # only some fields area allowed to be changed
-        areaDB.name = area.name
-        areaDB.description = area.description
-        areaDB.visible = area.visible
+        area_db.name = area.name
+        area_db.description = area.description
+        area_db.visible = area.visible
 
         try:
-            areaDB.update()
+            area_db.update()
         except Exception as e:
             raise ExceptionDatabase(type=GENERAL_ERROR, msg=str(e))
 
     @staticmethod
     def delete(area: Area) -> ExceptionDatabase:
-        areaDB = AreasORM.query.filter_by(id=area.id).first()
+        area_db = AreasORM.query.filter_by(id=area.id).first()
 
         try:
-            areaDB.delete()
+            area_db.delete()
         except Exception as e:
             raise ExceptionDatabase(type=GENERAL_ERROR, msg=str(e))
 

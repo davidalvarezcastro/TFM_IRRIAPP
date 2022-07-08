@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""Areas api tests
+"""Controllers api tests
 """
 import attr
 import http
@@ -10,10 +10,10 @@ import unittest
 from unittest.mock import Mock, patch
 
 from api.api import app
-from api.settings import API_AREA_AREAS, API_GET_ALL_AREAS, API_PREFIX, MIMETYPE_JSON
-from api.dto.area import ApiAreasSchema
-from domain.models.areas import Area
-from application.services.areas import ServiceAreas
+from api.settings import API_AREA_CONTROLLERS, API_GET_ALL_CONTROLLERS, API_PREFIX, MIMETYPE_JSON
+from api.dto.controller import ApiControllersSchema
+from domain.models.controllers import Controller
+from application.services.controllers import ServiceControllers
 from tests.integration.api.test_api_base import ApiBaseIntegrationTest
 
 
@@ -21,9 +21,9 @@ os.environ['MODE'] = "test"
 
 
 @unittest.skipUnless(os.getenv('INTEGRATION_TESTS'), 'INTEGRATION TEST')
-class ApiAreasIntegrationTest(ApiBaseIntegrationTest):
+class ApiControllersIntegrationTest(ApiBaseIntegrationTest):
 
-    print('ApiAreasIntegrationTest...')
+    print('ApiControllersIntegrationTest...')
 
     def setUp(self):
         self.app = app
@@ -33,22 +33,22 @@ class ApiAreasIntegrationTest(ApiBaseIntegrationTest):
     # INNER METHODS
 
     # TESTS
-    @patch.object(ServiceAreas, 'insert')
-    def test_api_post_area_return_created_and_new_area_ok(self, mock):
+    @patch.object(ServiceControllers, 'insert')
+    def test_api_post_controller_return_created_and_new_controller_ok(self, mock):
         post = {
             "name": "test_name_testing",
             "description": "test",
             "visible": 1
         }
-        expected_area = 15
+        expected_controller = 15
         expected = {
-            "area": expected_area,
-            "msg": f"Area {post['name']} ({expected_area}) created"
+            "controller": expected_controller,
+            "msg": f"Controller {post['name']} ({expected_controller}) created"
         }
-        mock.return_value = expected_area
+        mock.return_value = expected_controller
 
         result = self.client.post(
-            f'{API_PREFIX}{API_AREA_AREAS}',
+            f'{API_PREFIX}{API_AREA_CONTROLLERS}',
             data=json.dumps(post),
             content_type=MIMETYPE_JSON
         )
@@ -56,19 +56,19 @@ class ApiAreasIntegrationTest(ApiBaseIntegrationTest):
         data = json.loads(result.data)['data']
         self.assertEqual(data, expected)
 
-    @patch.object(ServiceAreas, 'insert')
-    def test_api_post_area_return_bad_request_ok(self, mock):
+    @patch.object(ServiceControllers, 'insert')
+    def test_api_post_controller_return_bad_request_ok(self, mock):
         post = {
             "name": "test_name_testing",
             "asd": "test",
             "visible": 1
         }
-        expected_area = 15
+        expected_controller = 15
         expected = "Invalid request format data"
-        mock.return_value = expected_area
+        mock.return_value = expected_controller
 
         result = self.client.post(
-            f'{API_PREFIX}{API_AREA_AREAS}',
+            f'{API_PREFIX}{API_AREA_CONTROLLERS}',
             data=json.dumps(post),
             content_type=MIMETYPE_JSON
         )
@@ -76,8 +76,8 @@ class ApiAreasIntegrationTest(ApiBaseIntegrationTest):
         data = json.loads(result.data)['message']
         self.assertEqual(data, expected)
 
-    @patch.object(ServiceAreas, 'insert')
-    def test_api_post_area_return_error_function_insert_ok(self, mock):
+    @patch.object(ServiceControllers, 'insert')
+    def test_api_post_controller_return_error_function_insert_ok(self, mock):
         post = {
             "name": "test_name_testing",
             "description": "test",
@@ -88,7 +88,7 @@ class ApiAreasIntegrationTest(ApiBaseIntegrationTest):
             side_effect=Exception(expected))
 
         result = self.client.post(
-            f'{API_PREFIX}{API_AREA_AREAS}',
+            f'{API_PREFIX}{API_AREA_CONTROLLERS}',
             data=json.dumps(post),
             content_type=MIMETYPE_JSON
         )
@@ -96,27 +96,30 @@ class ApiAreasIntegrationTest(ApiBaseIntegrationTest):
         data = json.loads(result.data)['message']
         self.assertEqual(data, expected)
 
-    @patch.object(ServiceAreas, 'get_by_id')
-    @patch.object(ServiceAreas, 'update', return_value=True)
-    def test_api_put_area_return_updated_area_ok(self, mock, mockFilter):
+    @patch.object(ServiceControllers, 'get_by_id')
+    @patch.object(ServiceControllers, 'update', return_value=True)
+    def test_api_put_controller_return_updated_controller_ok(self, mock, mockFilter):
         post = {
             "description": "test",
             "visible": 1
         }
+        controller = 4
+        controller = 4
         area = 10
         expected = {
-            "msg": f"Area {area} updated"
+            "msg": f"Controller {controller} updated"
         }
 
-        mockFilter.return_value = Area(
-            id=area,
+        mockFilter.return_value = Controller(
+            id=controller,
+            area=area,
             name="name1",
             description="old",
             visible=1
         )
 
         result = self.client.put(
-            f'{API_PREFIX}{API_AREA_AREAS}/{area}',
+            f'{API_PREFIX}{API_AREA_CONTROLLERS}/{controller}',
             data=json.dumps(post),
             content_type=MIMETYPE_JSON
         )
@@ -124,17 +127,18 @@ class ApiAreasIntegrationTest(ApiBaseIntegrationTest):
         data = json.loads(result.data)['data']
         self.assertEqual(data, expected)
 
-    @patch.object(ServiceAreas, 'update', return_value=True)
-    def test_api_put_area_return_bad_request_ok(self, mock):
+    @ patch.object(ServiceControllers, 'update', return_value=True)
+    def test_api_put_controller_return_bad_request_ok(self, mock):
         post = {
             "asd": "test",
             "visible": 1
         }
+        controller = 4
         area = 10
         expected = "Invalid request format data"
 
         result = self.client.put(
-            f'{API_PREFIX}{API_AREA_AREAS}/{area}',
+            f'{API_PREFIX}{API_AREA_CONTROLLERS}/{controller}',
             data=json.dumps(post),
             content_type=MIMETYPE_JSON
         )
@@ -142,26 +146,28 @@ class ApiAreasIntegrationTest(ApiBaseIntegrationTest):
         data = json.loads(result.data)['message']
         self.assertEqual(data, expected)
 
-    @patch.object(ServiceAreas, 'get_by_id')
-    @patch.object(ServiceAreas, 'update', return_value=True,)
-    def test_api_put_area_return_error_function_update_ok(self, mock, mockFilter):
+    @ patch.object(ServiceControllers, 'get_by_id')
+    @ patch.object(ServiceControllers, 'update', return_value=True,)
+    def test_api_put_controller_return_error_function_update_ok(self, mock, mockFilter):
         post = {
             "description": "test",
             "visible": 1
         }
+        controller = 4
         area = 10
         expected = 'error'
         mock.side_effect = Mock(
             side_effect=Exception(expected))
 
-        mockFilter.return_value = Area(
+        mockFilter.return_value = Controller(
             name="name1",
-            id=area,
+            area=area,
+            id=controller,
             description="old"
         )
 
         result = self.client.put(
-            f'{API_PREFIX}{API_AREA_AREAS}/{area}',
+            f'{API_PREFIX}{API_AREA_CONTROLLERS}/{controller}',
             data=json.dumps(post),
             content_type=MIMETYPE_JSON
         )
@@ -169,22 +175,23 @@ class ApiAreasIntegrationTest(ApiBaseIntegrationTest):
         data = json.loads(result.data)['message']
         self.assertEqual(data, expected)
 
-    @patch.object(ServiceAreas, 'get_by_id')
-    @patch.object(ServiceAreas, 'update', return_value=True,)
-    def test_api_put_area_return_error_not_found_area_ok(self, mock, mockFilter):
+    @ patch.object(ServiceControllers, 'get_by_id')
+    @ patch.object(ServiceControllers, 'update', return_value=True,)
+    def test_api_put_controller_return_error_not_found_controller_ok(self, mock, mockFilter):
         post = {
             "description": "test",
             "visible": 1
         }
+        controller = 4
         area = 10
-        expected = f"Area {area} not found"
+        expected = f"Controller {controller} not found"
         mock.side_effect = Mock(
             side_effect=Exception('error'))
 
         mockFilter.return_value = None
 
         result = self.client.put(
-            f'{API_PREFIX}{API_AREA_AREAS}/{area}',
+            f'{API_PREFIX}{API_AREA_CONTROLLERS}/{controller}',
             data=json.dumps(post),
             content_type=MIMETYPE_JSON
         )
@@ -192,28 +199,30 @@ class ApiAreasIntegrationTest(ApiBaseIntegrationTest):
         data = json.loads(result.data)['message']
         self.assertEqual(data, expected)
 
-    @patch.object(ServiceAreas, 'get_by_id')
-    @patch.object(ServiceAreas, 'delete', return_value=True)
-    def test_api_delete_area_remove_element_ok(self, mock, mockFilter):
+    @ patch.object(ServiceControllers, 'get_by_id')
+    @ patch.object(ServiceControllers, 'delete', return_value=True)
+    def test_api_delete_controller_remove_element_ok(self, mock, mockFilter):
         post = {
             "name": "test_name_testing",
             "description": "test",
             "visible": 1
         }
+        controller = 4
         area = 10
         expected = {
-            "msg": f"Area {area} deleted"
+            "msg": f"Controller {controller} deleted"
         }
 
-        mockFilter.return_value = Area(
-            id=area,
+        mockFilter.return_value = Controller(
+            id=controller,
+            area=area,
             name="name1",
             description="old",
             visible=1
         )
 
         result = self.client.delete(
-            f'{API_PREFIX}{API_AREA_AREAS}/{area}',
+            f'{API_PREFIX}{API_AREA_CONTROLLERS}/{controller}',
             data=json.dumps(post),
             content_type=MIMETYPE_JSON
         )
@@ -221,28 +230,30 @@ class ApiAreasIntegrationTest(ApiBaseIntegrationTest):
         data = json.loads(result.data)['data']
         self.assertEqual(data, expected)
 
-    @patch.object(ServiceAreas, 'get_by_id')
-    @patch.object(ServiceAreas, 'delete', return_value=True)
-    def test_api_delete_area_return_not_foundareanot_visible_ok(self, mock, mockFilter):
+    @ patch.object(ServiceControllers, 'get_by_id')
+    @ patch.object(ServiceControllers, 'delete', return_value=True)
+    def test_api_delete_controller_return_not_foundareanot_visible_ok(self, mock, mockFilter):
         post = {
             "name": "test_name_testing",
             "description": "test",
             "visible": 0
         }
+        controller = 4
         area = 10
         expected = {
-            "msg": f"Area {area} deleted"
+            "msg": f"Controller {controller} deleted"
         }
 
-        mockFilter.return_value = Area(
-            id=area,
+        mockFilter.return_value = Controller(
+            id=controller,
+            area=area,
             name="name1",
             description="old",
             visible=1
         )
 
         result = self.client.delete(
-            f'{API_PREFIX}{API_AREA_AREAS}/{area}',
+            f'{API_PREFIX}{API_AREA_CONTROLLERS}/{controller}',
             data=json.dumps(post),
             content_type=MIMETYPE_JSON
         )
@@ -250,28 +261,30 @@ class ApiAreasIntegrationTest(ApiBaseIntegrationTest):
         data = json.loads(result.data)['data']
         self.assertEqual(data, expected)
 
-    @patch.object(ServiceAreas, 'get_by_id')
-    @patch.object(ServiceAreas, 'delete', return_value=True,)
-    def test_api_delete_area_return_error_function_delete_ok(self, mock, mockFilter):
+    @ patch.object(ServiceControllers, 'get_by_id')
+    @ patch.object(ServiceControllers, 'delete', return_value=True,)
+    def test_api_delete_controller_return_error_function_delete_ok(self, mock, mockFilter):
         post = {
             "name": "test_name_testing",
             "description": "test",
             "visible": 1
         }
+        controller = 4
         area = 10
         expected = 'error'
         mock.side_effect = Mock(
             side_effect=Exception(expected))
 
-        mockFilter.return_value = Area(
-            id=area,
+        mockFilter.return_value = Controller(
+            id=controller,
+            area=area,
             name="name1",
             description="old",
             visible=1
         )
 
         result = self.client.delete(
-            f'{API_PREFIX}{API_AREA_AREAS}/{area}',
+            f'{API_PREFIX}{API_AREA_CONTROLLERS}/{controller}',
             data=json.dumps(post),
             content_type=MIMETYPE_JSON
         )
@@ -279,23 +292,24 @@ class ApiAreasIntegrationTest(ApiBaseIntegrationTest):
         data = json.loads(result.data)['message']
         self.assertEqual(data, expected)
 
-    @patch.object(ServiceAreas, 'get_by_id')
-    @patch.object(ServiceAreas, 'delete', return_value=True,)
-    def test_api_delete_area_return_error_not_found_area_ok(self, mock, mockFilter):
+    @ patch.object(ServiceControllers, 'get_by_id')
+    @ patch.object(ServiceControllers, 'delete', return_value=True,)
+    def test_api_delete_controller_return_error_not_found_controller_ok(self, mock, mockFilter):
         post = {
             "name": "test_name_testing",
             "description": "test",
             "visible": 1
         }
+        controller = 4
         area = 10
-        expected = f"Area {area} not found"
+        expected = f"Controller {controller} not found"
         mock.side_effect = Mock(
             side_effect=Exception('error'))
 
         mockFilter.return_value = None
 
         result = self.client.delete(
-            f'{API_PREFIX}{API_AREA_AREAS}/{area}',
+            f'{API_PREFIX}{API_AREA_CONTROLLERS}/{controller}',
             data=json.dumps(post),
             content_type=MIMETYPE_JSON
         )
@@ -303,11 +317,13 @@ class ApiAreasIntegrationTest(ApiBaseIntegrationTest):
         data = json.loads(result.data)['message']
         self.assertEqual(data, expected)
 
-    @patch.object(ServiceAreas, 'get_by_id')
-    def test_api_get_by_id_area_return_area_ok(self, mock):
+    @ patch.object(ServiceControllers, 'get_by_id')
+    def test_api_get_by_id_controller_return_controller_ok(self, mock):
+        controller = 4
         area = 10
-        expected = Area(
-            id=area,
+        expected = Controller(
+            id=controller,
+            area=area,
             name="name",
             description="old",
             visible=1
@@ -315,16 +331,18 @@ class ApiAreasIntegrationTest(ApiBaseIntegrationTest):
 
         mock.return_value = expected
 
-        result = self.client.get(f'{API_PREFIX}{API_AREA_AREAS}/{area}')
+        result = self.client.get(f'{API_PREFIX}{API_AREA_CONTROLLERS}/{controller}')
         self.assert_response_200_OK(result)
         data = json.loads(result.data)['data']
-        self.assertEqual(data, ApiAreasSchema().dump(expected))
+        self.assertEqual(data, ApiControllersSchema().dump(expected))
 
-    @patch.object(ServiceAreas, 'get_by_id')
-    def test_api_get_by_id_area_return_not_found_area_not_visible_ok(self, mock):
+    @ patch.object(ServiceControllers, 'get_by_id')
+    def test_api_get_by_id_controller_return_not_found_controller_not_visible_ok(self, mock):
+        controller = 4
         area = 10
-        expected = Area(
-            id=area,
+        expected = Controller(
+            id=controller,
+            area=area,
             name="name",
             description="old",
             visible=0
@@ -332,46 +350,50 @@ class ApiAreasIntegrationTest(ApiBaseIntegrationTest):
 
         mock.return_value = expected
 
-        result = self.client.get(f'{API_PREFIX}{API_AREA_AREAS}/{area}')
+        result = self.client.get(f'{API_PREFIX}{API_AREA_CONTROLLERS}/{controller}')
         self.assert_response_200_OK(result)
         data = json.loads(result.data)['data']
-        self.assertEqual(data, ApiAreasSchema().dump(expected))
+        self.assertEqual(data, ApiControllersSchema().dump(expected))
 
-    @patch.object(ServiceAreas, 'get_by_id')
-    def test_api_get_by_id_area_return_error_not_found_area_ok(self, mock):
+    @ patch.object(ServiceControllers, 'get_by_id')
+    def test_api_get_by_id_controller_return_error_not_found_controller_ok(self, mock):
+        controller = 4
         area = 10
-        expected = f"Area {area} not found"
+        expected = f"Controller {controller} not found"
 
         mock.return_value = None
 
-        result = self.client.get(f'{API_PREFIX}{API_AREA_AREAS}/{area}')
+        result = self.client.get(f'{API_PREFIX}{API_AREA_CONTROLLERS}/{controller}')
         self.assert_response_404_OK(result)
         data = json.loads(result.data)['message']
         self.assertEqual(data, expected)
 
-    @patch.object(ServiceAreas, 'get_by_id')
-    def test_api_get_by_id_area_return_error_function_filter_area_ok(self, mock):
+    @ patch.object(ServiceControllers, 'get_by_id')
+    def test_api_get_by_id_controller_return_error_function_filter_controller_ok(self, mock):
+        controller = 4
         area = 10
         expected = "error"
         mock.side_effect = Mock(
             side_effect=Exception(expected))
 
-        result = self.client.get(f'{API_PREFIX}{API_AREA_AREAS}/{area}')
+        result = self.client.get(f'{API_PREFIX}{API_AREA_CONTROLLERS}/{controller}')
         self.assert_response_500_OK(result)
         data = json.loads(result.data)['message']
         self.assertEqual(data, expected)
 
-    @patch.object(ServiceAreas, 'get_all')
-    def test_api_get_all_area_return_array_ok(self, mock):
+    @ patch.object(ServiceControllers, 'get_all')
+    def test_api_get_all_controller_return_array_ok(self, mock):
         expected = [
-            Area(
+            Controller(
                 id=10,
+                area=2,
                 name="name1",
                 description="old",
                 visible=1
             ),
-            Area(
+            Controller(
                 id=1,
+                area=2,
                 name="name2",
                 description="old",
                 visible=1
@@ -380,28 +402,28 @@ class ApiAreasIntegrationTest(ApiBaseIntegrationTest):
 
         mock.return_value = expected
 
-        result = self.client.get(f'{API_PREFIX}{API_GET_ALL_AREAS}')
+        result = self.client.get(f'{API_PREFIX}{API_GET_ALL_CONTROLLERS}')
         self.assert_response_200_OK(result)
         data = json.loads(result.data)['data']
-        self.assertEqual(data, {'areas': ApiAreasSchema(many=True).dump(expected)})
+        self.assertEqual(data, {'controllers': ApiControllersSchema(many=True).dump(expected)})
 
-    @patch.object(ServiceAreas, 'get_all')
-    def test_api_get_all_area_return_empty_array_ok(self, mock):
+    @ patch.object(ServiceControllers, 'get_all')
+    def test_api_get_all_controller_return_empty_array_ok(self, mock):
         expected = []
         mock.return_value = expected
 
-        result = self.client.get(f'{API_PREFIX}{API_GET_ALL_AREAS}')
+        result = self.client.get(f'{API_PREFIX}{API_GET_ALL_CONTROLLERS}')
         self.assert_response_200_OK(result)
         data = json.loads(result.data)['data']
-        self.assertEqual(data, {'areas': expected})
+        self.assertEqual(data, {'controllers': expected})
 
-    @patch.object(ServiceAreas, 'get_all')
-    def test_api_get_all_area_return_error_function_filter_area_ok(self, mock):
+    @ patch.object(ServiceControllers, 'get_all')
+    def test_api_get_all_controller_return_error_function_filter_controller_ok(self, mock):
         expected = "error"
         mock.side_effect = Mock(
             side_effect=Exception(expected))
 
-        result = self.client.get(f'{API_PREFIX}{API_GET_ALL_AREAS}')
+        result = self.client.get(f'{API_PREFIX}{API_GET_ALL_CONTROLLERS}')
         self.assert_response_500_OK(result)
         data = json.loads(result.data)['message']
         self.assertEqual(data, expected)

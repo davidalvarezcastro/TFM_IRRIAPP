@@ -15,8 +15,8 @@ DATA_AREAS = [
 ]
 
 DATA_CONTROLLERS = [
-    {'area': 1, 'id': 1, 'name': 'test_controller_simulator', 'key': '',
+    {'area': 1, 'id': 1, 'name': 'test_controller_simulator', 'key': None,
      'description': 'Simulation & testing controller for dev environment', 'visible': 0},
-    {'area': 2, 'id': 2, 'name': 'meteo_sensors_controller', 'key': '',
-     'description': 'Controller for reading meteological sensor data and send to server', 'visible': 1}
+    {'area': 2, 'id': 2, 'name': 'meteo_sensors_controller', 'key': None,
+     'description': 'Controller for reading meteological sensor data and send it to server', 'visible': 1}
 ]

@@ -27,8 +27,7 @@ class ControllersDAL(InterfaceControllersDAL):
         if aux is not None:
             raise ExceptionDatabase(type=DUPLICATED, msg=f"Controller {controller.id} duplicated!")
 
-        controllerDB = ControllersORM(
-            id=controller.id,
+        controller_db = ControllersORM(
             area=controller.area,
             name=controller.name,
             description=controller.description,
@@ -36,37 +35,40 @@ class ControllersDAL(InterfaceControllersDAL):
             visible=controller.visible
         )
 
+        if controller.id != -1:
+            controller_db.id = controller.id
+
         try:
-            controllerDB.add()
-            controllerDB.refresh()
-            return controllerDB.id
+            controller_db.add()
+            controller_db.refresh()
+            return controller_db.id
         except Exception as e:
             raise ExceptionDatabase(type=GENERAL_ERROR, msg=str(e))
 
     @staticmethod
     def update(controller: Controller) -> ExceptionDatabase:
-        controllerDB = ControllersORM.query.filter_by(id=controller.id).first()
+        controller_db = ControllersORM.query.filter_by(id=controller.id).first()
 
-        if controllerDB is None:
+        if controller_db is None:
             raise ExceptionDatabase(type=NOT_FOUND, msg=f"Controller {controller.id} is not saved!")
 
         # only some fields controllers allowed to be changed
-        controllerDB.name = controller.name
-        controllerDB.description = controller.description
-        controllerDB.key = controller.key
-        controllerDB.visible = controller.visible
+        controller_db.name = controller.name
+        controller_db.description = controller.description
+        controller_db.key = controller.key
+        controller_db.visible = controller.visible
 
         try:
-            controllerDB.update()
+            controller_db.update()
         except Exception as e:
             raise ExceptionDatabase(type=GENERAL_ERROR, msg=str(e))
 
     @staticmethod
     def delete(controller: Controller) -> ExceptionDatabase:
-        controllerDB = ControllersORM.query.filter_by(id=controller.id).first()
+        controller_db = ControllersORM.query.filter_by(id=controller.id).first()
 
         try:
-            controllerDB.delete()
+            controller_db.delete()
         except Exception as e:
             raise ExceptionDatabase(type=GENERAL_ERROR, msg=str(e))
 

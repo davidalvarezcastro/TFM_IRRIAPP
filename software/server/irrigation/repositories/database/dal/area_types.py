@@ -22,39 +22,39 @@ class AreaTypesDAL(InterfaceAreaTypesDAL):
         if aux is not None:
             raise ExceptionDatabase(type=DUPLICATED, msg=f"Type {type.id} duplicated!")
 
-        typeDB = TypesORM(
+        type_db = TypesORM(
             id=type.id,
             description=type.description
         )
 
         try:
-            typeDB.add()
-            typeDB.refresh()
-            return typeDB.id
+            type_db.add()
+            type_db.refresh()
+            return type_db.id
         except Exception as e:
             raise ExceptionDatabase(type=GENERAL_ERROR, msg=str(e))
 
     @staticmethod
     def update(type: AreaType) -> ExceptionDatabase:
-        typeDB = TypesORM.query.filter_by(id=type.id).first()
+        type_db = TypesORM.query.filter_by(id=type.id).first()
 
-        if typeDB is None:
+        if type_db is None:
             raise ExceptionDatabase(type=NOT_FOUND, msg=f"Type {type.id} is not saved!")
 
         # only some fields type allowed to be changed
-        typeDB.description = type.description
+        type_db.description = type.description
 
         try:
-            typeDB.update()
+            type_db.update()
         except Exception as e:
             raise ExceptionDatabase(type=GENERAL_ERROR, msg=str(e))
 
     @staticmethod
     def delete(type: AreaType) -> ExceptionDatabase:
-        typeDB = TypesORM.query.filter_by(id=type.id).first()
+        type_db = TypesORM.query.filter_by(id=type.id).first()
 
         try:
-            typeDB.delete()
+            type_db.delete()
         except Exception as e:
             raise ExceptionDatabase(type=GENERAL_ERROR, msg=str(e))
 

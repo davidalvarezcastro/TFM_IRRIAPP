@@ -13,8 +13,8 @@ from api.api import app
 from api.settings import API_AREA_TYPES, API_GET_ALL_AREA_TYPES, API_PREFIX, MIMETYPE_JSON
 from api.dto.area_type import ApiAreaTypesSchema
 from domain.models.area_types import AreaType
-from tests.integration.api.test_api_base import ApiBaseIntegrationTest
 from application.services.area_types import ServiceAreaTypes
+from tests.integration.api.test_api_base import ApiBaseIntegrationTest
 
 
 os.environ['MODE'] = "test"
@@ -92,7 +92,7 @@ class ApiAreaTypesIntegrationTest(ApiBaseIntegrationTest):
 
     @patch.object(ServiceAreaTypes, 'get_by_id')
     @patch.object(ServiceAreaTypes, 'update', return_value=True)
-    def test_api_put_type_return_created_and_new_type_ok(self, mock, mockFilter):
+    def test_api_put_type_return_updated_type_ok(self, mock, mockFilter):
         post = {
             "description": "test"
         }
