@@ -1,9 +1,11 @@
 # -*- coding: utf-8 -*-
+import time
 import click
 import os
 import subprocess
 
 DOCKER_MQTT_NAME = 'broker_testing'
+DOCKER_DB_NAME = 'database_testing'
 
 
 def setenv(variable, default):
@@ -57,6 +59,11 @@ def test(unit, integration, acceptance, all, coverage, browser, args):
         os.environ['UNIT_TESTS'] = '1'
     if integration or all:
         os.environ['INTEGRATION_TESTS'] = '1'
+        up_container(DOCKER_MQTT_NAME)
+        up_container(DOCKER_DB_NAME)
+        time.sleep(5)
+        from repositories.database.init_db import init_db
+        init_db()
     if acceptance or all:
         os.environ['ACCEPTANCE_TESTS'] = '1'
 
@@ -68,8 +75,8 @@ def test(unit, integration, acceptance, all, coverage, browser, args):
             '\'venv/*, test/*\'',
             '-m',
             'unittest',
-            # 'tests/__main__.py',
-            'tests/unit/domain/database/test_dal_area_types.py',
+            'tests/__main__.py',
+            # 'tests/integration/api/test_api_controllers.py',
             '&&',
             'coverage',
             'html',
@@ -96,10 +103,11 @@ def test(unit, integration, acceptance, all, coverage, browser, args):
         ]
 
     python_tests_cmd.extend(args)
-
-    # up_container(DOCKER_MQTT_NAME)
     subprocess.call(' '.join(python_tests_cmd), shell=True)
-    # down_container(DOCKER_MQTT_NAME)
+
+    if integration or all:
+        down_container(DOCKER_MQTT_NAME)
+        down_container(DOCKER_DB_NAME)
 
 
 if __name__ == '__main__':
