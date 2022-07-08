@@ -3,6 +3,7 @@ import http
 from flask import Blueprint, Response, request
 
 from api import jsend
+from utils import logger_error
 from api.settings import API_AREA_TYPES, API_GET_ALL_AREA_TYPES, MIMETYPE_JSON
 from api.dto.area_type import ApiAreaTypesSchema
 from domain.models.area_types import AreaType
@@ -13,13 +14,14 @@ blueprint = Blueprint('area_types', __name__)
 
 @blueprint.route(API_AREA_TYPES, methods=['POST'])
 def add():
+    api_name = "Api Area Types (add)"
     status_code = http.HTTPStatus.CREATED
 
     try:
         try:
             new_type_data = ApiAreaTypesSchema().load(request.json)
         except Exception as e:
-            print(e)
+            logger_error(api_name, str(e))
             status_code = http.HTTPStatus.BAD_REQUEST
             raise Exception("Invalid request format data")
 
@@ -37,8 +39,10 @@ def add():
             })
         except Exception as e:
             status_code = 500
+            logger_error(api_name, str(e))
             raise e
     except Exception as e:
+        logger_error(api_name, str(e))
         response = jsend.error(str(e))
 
     return Response(
@@ -49,13 +53,15 @@ def add():
 
 
 @blueprint.route(f'{API_AREA_TYPES}/<int:type>', methods=['PUT'])
-def update(type):
+def update(type: int):
+    api_name = "Api Area Types (update)"
     status_code = http.HTTPStatus.OK
 
     try:
         try:
             updated_type_data = ApiAreaTypesSchema(only=ApiAreaTypesSchema.PUT_FIELDS).load(request.json)
-        except Exception:
+        except Exception as e:
+            logger_error(api_name, str(e))
             status_code = http.HTTPStatus.BAD_REQUEST
             raise Exception("Invalid request format data")
 
@@ -76,9 +82,11 @@ def update(type):
                     "msg": f"Type {type} updated"
                 })
         except Exception as e:
+            logger_error(api_name, str(e))
             status_code = 500
             raise e
     except Exception as e:
+        logger_error(api_name, str(e))
         response = jsend.error(str(e))
 
     return Response(
@@ -90,6 +98,7 @@ def update(type):
 
 @blueprint.route(f'{API_AREA_TYPES}/<int:type>', methods=['DELETE'])
 def delete(type: int):
+    api_name = "Api Area Types (delete)"
     status_code = http.HTTPStatus.OK
 
     try:
@@ -102,16 +111,18 @@ def delete(type: int):
 
             else:
                 ServiceAreaTypes().delete(
-                    type=type
+                    type=type_db
                 )
 
                 response = jsend.success({
                     "msg": f"Type {type} deleted"
                 })
         except Exception as e:
+            logger_error(api_name, str(e))
             status_code = 500
             raise e
     except Exception as e:
+        logger_error(api_name, str(e))
         response = jsend.error(str(e))
 
     return Response(
@@ -123,6 +134,7 @@ def delete(type: int):
 
 @blueprint.route(f'{API_AREA_TYPES}/<int:type>', methods=['GET'])
 def get_by_id(type: int):
+    api_name = "Api Area Types (get_by_id)"
     status_code = http.HTTPStatus.OK
 
     try:
@@ -134,6 +146,7 @@ def get_by_id(type: int):
         else:
             response = jsend.success(ApiAreaTypesSchema().dump(type_db))
     except Exception as e:
+        logger_error(api_name, str(e))
         status_code = http.HTTPStatus.INTERNAL_SERVER_ERROR
         response = jsend.error(str(e))
 
@@ -146,6 +159,7 @@ def get_by_id(type: int):
 
 @blueprint.route(API_GET_ALL_AREA_TYPES, methods=['GET'])
 def get_all():
+    api_name = "Api Area Types (get_by_id)"
     status_code = http.HTTPStatus.OK
 
     try:
@@ -155,6 +169,7 @@ def get_all():
             )
         })
     except Exception as e:
+        logger_error(api_name, str(e))
         status_code = http.HTTPStatus.INTERNAL_SERVER_ERROR
         response = jsend.error(str(e))
 

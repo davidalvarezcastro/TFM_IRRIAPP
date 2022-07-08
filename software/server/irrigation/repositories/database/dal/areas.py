@@ -26,11 +26,13 @@ class AreasDAL(InterfaceAreasDAL):
             raise ExceptionDatabase(type=DUPLICATED, msg=f"Area {area.id} duplicated!")
 
         areaDB = AreasORM(
-            id=area.id,
             name=area.name,
             description=area.description,
             visible=area.visible
         )
+
+        if area.id != -1:
+            areaDB.id = area.id
 
         try:
             areaDB.add()

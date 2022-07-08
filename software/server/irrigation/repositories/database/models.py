@@ -18,7 +18,7 @@ class TypesORM(Base):
     id = Column(Integer, primary_key=True)
     description = Column(Text)
 
-    def __init__(self, id: int, description: str):
+    def __init__(self, description: str, id: int = None):
         self.id = id
         self.description = description
 
@@ -39,13 +39,13 @@ class AreasORM(Base):
         'table to save different areas'}
 
     id = Column(Integer, primary_key=True)
-    name = Column(String(25), nullable=False)
+    name = Column(String(25), nullable=False, unique=True)
     description = Column(Text, nullable=True)
     visible = Column(SmallInteger, server_default="1")
     date = Column(TIMESTAMP, nullable=False,
                   server_default=text("current_timestamp()" if not is_sqlite() else "current_timestamp"))
 
-    def __init__(self, id: int, name: str, description: str = None, visible: bool = False, date: str = None):
+    def __init__(self, name: str, description: str = None, visible: bool = False, date: str = None, id: int = None):
         self.id = id
         self.name = name
         self.description = description
@@ -83,8 +83,8 @@ class ControllersORM(Base):
                   server_default=text("current_timestamp()" if not is_sqlite() else "current_timestamp"))
 
     def __init__(
-            self, area: int, id: int, name: str, description: str = None, key: str = None, visible: bool = False,
-            date: str = None):
+            self, area: int, name: str, description: str = None, key: str = None, visible: bool = False,
+            date: str = None, id: int = None):
         self.area = area
         self.id = id
         self.name = name

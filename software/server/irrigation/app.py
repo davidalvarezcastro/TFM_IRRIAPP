@@ -15,6 +15,6 @@ _LOGGER = Log(logger=logging.getLogger('irrigation'))
 
 
 if __name__ == '__main__':
-    _LOGGER.info("Iniciando Sistema de Gestión Inteligente")
+    _LOGGER.info("Starting irrigation management system")
     # run
     app.run(host=API_HOST, port=API_PORT)

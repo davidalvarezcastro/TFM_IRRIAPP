@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""Tests para api de incidencia
+"""Area types api tests
 """
 import attr
 import http
