@@ -1,7 +1,7 @@
 import typing
 
 from .interface_controllers import InterfaceControllersDAL
-from repositories.database.errors import DUPLICATED, GENERAL_ERROR, NOT_FOUND
+from repositories.errors import DUPLICATED, GENERAL_ERROR, NOT_FOUND
 from repositories.database.models import ControllersORM
 from domain.models.controllers import Controller
 from exceptions.database import ExceptionDatabase

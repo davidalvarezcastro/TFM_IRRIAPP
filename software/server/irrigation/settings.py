@@ -48,6 +48,8 @@ class DBMongoSettings():
     PASS: str = env.get('MONGODB_PASS', 'shhhh it is a secret!')
     DATABASE: str = env.get('MONGODB_DATABASE', 'irrigation')
     URI: str = env.get('MONGODB_URI', None)
+    COLLECTION_SENSORS: str = 'sensors_historic'
+    COLLECTION_ACTUATOR_IRRIGATION: str = 'irrigation_historic'
 
 
 # MQTT

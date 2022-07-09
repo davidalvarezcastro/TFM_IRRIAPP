@@ -1,7 +1,7 @@
 import typing
 
 from .interface_area_types import InterfaceAreaTypesDAL
-from repositories.database.errors import DUPLICATED, GENERAL_ERROR, NOT_FOUND
+from repositories.errors import DUPLICATED, GENERAL_ERROR, NOT_FOUND
 from repositories.database.models import TypesORM
 from domain.models.area_types import AreaType
 from exceptions.database import ExceptionDatabase
