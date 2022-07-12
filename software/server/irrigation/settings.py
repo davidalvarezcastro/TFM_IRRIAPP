@@ -26,11 +26,8 @@ MODE = env.get('MODE', 'dev')
 API_HOST = env.get('API_HOST', '0.0.0.0')
 API_PORT = int(env.get('API_PORT', 5000))
 
+
 # DATABASES
-print(env.get('DB_DATABASE_IRRIGATION'))
-print(env.get('DB_DATABASE_IRRIGATION', 'irrigation'))
-
-
 class DBMySQLSettings():
     HOST: str = env.get('DB_HOST', 'localhost')
     PORT: str = int(env.get('DB_PORT', 3306))

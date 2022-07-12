@@ -69,7 +69,6 @@ class ServiceSensorHistoricUnitTest(unittest.TestCase):
                 data=self.sensor_data
             )
 
-        print(str(context.exception))
         self.assertTrue("error" in str(context.exception))
         mock.assert_called_once()
 

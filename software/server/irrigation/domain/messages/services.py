@@ -9,34 +9,34 @@ from domain.messages.wrapper import MessagesClientWrapper
 
 class MessagesInterface(ABC):
     """
-    Interfaz de comunicación con el servicio de eventos de la aplicación
+    Communication interface to the events server
     """
 
     @abstractmethod
-    def pub_sensors_state_controllers(self, area: str, controller: str,
-                                      payload: dict = None, qos: int = 1, wait_for_publish: bool = False) -> None:
+    def pub_sensors_status_controllers(self, area: str, controller: str,
+                                       payload: dict = None, qos: int = 1, wait_for_publish: bool = False) -> None:
         """
-        Función para emitir el evento de estado de los sensores de un controlador
+        Function to emit a status event from the sensors controller
 
         Args:
-            area (str): identificador de la zona a la que pertenece el controlador
-            controller (str): identificador del controlador
-            payload (dict): listado de los valores leidos por los sensores
-            qos (int): calidad del servicio
-            wait_for_publish (bool): espera a recibir la confirmación
+            area (str): area id
+            controller (str): controller id
+            payload (dict)
+            qos (int)
+            wait_for_publish (bool)
         Raise:
             Exception
         """
         raise Exception("NotImplementedException")
 
     @abstractmethod
-    def sub_sensors_state_controllers(self, callback, qos: int = 1) -> None:
+    def sub_sensors_status_controllers(self, callback, qos: int = 1) -> None:
         """
-        Función para subscribirse al evento con los datos de los sensores de los controladores
+         Function to subscribe to the status event from the sensors controller
 
         Args:
-            callback (Function): función para gestionar la recepción de eventos
-            qos (int): calidad del servicio
+            callback (Function)
+            qos (int)
         Raise:
             Exception
         """
@@ -48,9 +48,9 @@ class MessagesServices(MessagesInterface):
     messages_client: MessagesClientWrapper = attr.ib()
 
     # PUB METHODS
-    def pub_sensors_state_controllers(self, area: str, controller: str, payload: dict = None, qos: int = 1,
-                                      wait_for_publish: bool = False) -> None:
-        topic = topics.TOPIC_AREA_SENSORS_STATE_CONTROLLER.format(
+    def pub_sensors_status_controllers(self, area: str, controller: str, payload: dict = None, qos: int = 1,
+                                       wait_for_publish: bool = False) -> None:
+        topic = topics.TOPIC_AREA_SENSORS_STATUS_CONTROLLER.format(
             area=area,
             controller=controller
         )
@@ -63,8 +63,8 @@ class MessagesServices(MessagesInterface):
         )
 
     # SUB METHODS
-    def sub_sensors_state_controllers(self, callback, qos: int = 1) -> None:
-        topic = topics.TOPIC_AREA_SENSORS_STATE_CONTROLLER.format(
+    def sub_sensors_status_controllers(self, callback, qos: int = 1) -> None:
+        topic = topics.TOPIC_AREA_SENSORS_STATUS_CONTROLLER.format(
             area="+",
             controller="+"
         )

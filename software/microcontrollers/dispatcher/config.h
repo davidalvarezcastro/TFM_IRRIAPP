@@ -11,7 +11,7 @@
 #define MQTT_USERNAME "username"
 #define MQTT_PASSWORD "password"
 #define MQTT_ID "id"
-#define TOPIC_SEND_DATA "zona/{zona}/controlador/{controlador}/sensores/estado"
+#define TOPIC_SEND_DATA "area/{area}/controller/{controller}/sensors/status"
 
 // serial settings
 #define SERIAL_DEFAULT_BAUND 9600

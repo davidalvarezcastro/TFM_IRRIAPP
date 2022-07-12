@@ -1,2 +1,2 @@
 # coding=utf-8
-CONTROLLER_STATE = 'estado-controlador'
+CONTROLLER_STATUS = 'estado-controlador'

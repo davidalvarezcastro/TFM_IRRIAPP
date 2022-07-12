@@ -34,7 +34,7 @@ services:
 
   broker:
     image: eclipse-mosquitto
-    container_name: irrigation_broker
+    container_name: ${MQTT_HOST:-irrigation_broker}
     restart: always
     volumes:
       - ./config/mosquitto/mosquitto.conf:/mosquitto/config/mosquitto.conf
@@ -88,3 +88,23 @@ services:
       - ./server/irrigation/requirements.txt:/irrigation/requirements.txt
     ports:
       - ${API_PORT}:5000
+
+  recollector:
+    container_name: irrigation_recollector
+    networks:
+      default:
+        aliases:
+          - irrigation_recollector
+    build:
+      context: .
+      dockerfile: ./config/docker/service.Dockerfile
+      args:
+        - LOGS_FOLDER=logs
+        - SERVICE_FILE=run_collector.py
+    restart: always
+    env_file: .env
+    volumes:
+      - ./server/irrigation:/irrigation
+      - ./logs:/irrigation/logs
+      - ./.env:/irrigation/.env
+      - ./server/irrigation/requirements.txt:/irrigation/requirements.txt
