@@ -124,13 +124,4 @@ ENV/
 # migrations => name_DEF.py
 **/migrations/versions/*_.py
 
-# contenedores
-**/databases/mongodb/data
-**/databases/mysql/data
-logs/*.log
-logs/*.logs
-
 **/irrigation/main.py
-
-#mongo
-nzef.js
