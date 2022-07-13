@@ -9,19 +9,22 @@ String FormatData::formatSensorDataAsJSON(String data)
   String value = data.substring(0, first);
   int second = data.indexOf(SERIAL_SEPARATOR_STRING, first + 1);
   String unit = data.substring(data.indexOf(SERIAL_SEPARATOR_STRING) + 1, second);
-  dataJSON += "\"humidity\": {\"value\": " + value + ", \"unit\": \"" + unit.toLowerCase() + "\"}";
+  unit.toLowerCase();
+  dataJSON += "\"humidity\": {\"value\": " + value + ", \"unit\": \"" + unit + "\"}";
 
   first = data.indexOf(SERIAL_SEPARATOR_STRING, second + 1);
   value = data.substring(second + 1, first);
   second = data.indexOf(SERIAL_SEPARATOR_STRING, first + 1);
   unit = data.substring(first + 1, second);
-  dataJSON += ", \"temperature\": {\"value\": " + value + ", \"unit\": \"" + unit.toLowerCase() + "\"}";
+  unit.toLowerCase();
+  dataJSON += ", \"temperature\": {\"value\": " + value + ", \"unit\": \"" + unit + "\"}";
 
   first = data.indexOf(SERIAL_SEPARATOR_STRING, second + 1);
   value = data.substring(second + 1, first);
   second = data.indexOf(SERIAL_SEPARATOR_STRING, first + 1);
   unit = data.substring(first + 1, second);
-  dataJSON += ", \"raining\": {\"value\": " + value + ", \"unit\": \"" + unit.toLowerCase() + "\"}";
+  unit.toLowerCase();
+  dataJSON += ", \"raining\": {\"value\": " + value + ", \"unit\": \"" + unit + "\"}";
 
   return "{" + dataJSON + "}";
 }

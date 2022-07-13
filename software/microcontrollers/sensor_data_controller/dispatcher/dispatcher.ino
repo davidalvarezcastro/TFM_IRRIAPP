@@ -37,6 +37,7 @@ void setup()
 
 void loop()
 {
+  Serial.println("reading serial...");
   // process string received from serial port
   reader.readSerial(&mySerial);
 
@@ -58,5 +59,5 @@ void loop()
     break;
   }
 
-  delay(1000);
+  delay(100);
 }

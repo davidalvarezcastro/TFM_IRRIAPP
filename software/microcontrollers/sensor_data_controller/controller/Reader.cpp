@@ -49,7 +49,7 @@ void Reader::readRaining()
   Serial.print(" Raining?: ");
   Serial.print(rainingValue);
   Serial.println("\n");
-  this->isRaining == LOW;
+  this->isRaining = rainingValue == LOW;
 
   this->printRaining();
 }
