@@ -9,6 +9,7 @@ from api.endpoints import init
 from api.endpoints import areas
 from api.endpoints import area_types
 from api.endpoints import controllers
+from api.endpoints import sensor_data
 from repositories.database.init_db import init_db
 
 
@@ -29,6 +30,7 @@ bp.register_blueprint(init.blueprint)
 bp.register_blueprint(area_types.blueprint)
 bp.register_blueprint(areas.blueprint)
 bp.register_blueprint(controllers.blueprint)
+bp.register_blueprint(sensor_data.blueprint)
 app.register_blueprint(bp)
 
 # cors

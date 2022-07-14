@@ -36,6 +36,12 @@ class QuerySensorData(QueryHistoricData):
             fields.append('controller_id')
         if self.area_id is not None:
             fields.append('area_id')
+
+        return fields
+
+    def get_greater_equals_than_values(self):
+        fields = []
+
         if self.humidity is not None:
             fields.append('humidity')
         if self.temperature is not None:

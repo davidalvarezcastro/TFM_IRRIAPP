@@ -42,9 +42,9 @@ class DALSensorDataUnitTest(unittest.TestCase):
 
         self.manager.connection['col'].delete_many({})
 
-    # INNER METHODS
+    # # INNER METHODS
 
-    # TESTS
+    # # TESTS
     @patch.object(MongoManager, 'closeMongoConnection', return_value=True)
     def test_insert_sensor_data_ok(self, mock):
         result = self.dao.insert(
@@ -127,7 +127,7 @@ class DALSensorDataUnitTest(unittest.TestCase):
         )
 
         mock.assert_called_once()
-        self.assertTrue(len(list(result)) == 2)
+        self.assertTrue(len(list(result)) == 3)
 
     @patch.object(MongoManager, 'closeMongoConnection', return_value=True)
     def test_query_sensor_data_interval_dates_return_no_data_ok(self, mock):
@@ -157,15 +157,58 @@ class DALSensorDataUnitTest(unittest.TestCase):
         self.assertTrue(len(list(result)) == 0)
 
     @ patch.object(MongoManager, 'closeMongoConnection', return_value=True)
-    def test_query_none_raise_exception_ok(self, mock):
+    def test_query_sensor_data_sensor_data_query_ok(self, mock):
+        array_data = []
+        # mock data
+        for i in range(4):
+            data = {
+                'controller_id': 1,
+                'controller': f"controller{i}",
+                'area_id': 1,
+                'area': f"area{i}",
+                'humidity': 5 * (i + 1),
+                'temperature': 10 * (i + 1),
+                'raining': 0,
+                'date': datetime.datetime(2022, 7, 5 + i, 21, 00, 00, 0),
+            }
+            array_data.append(data)
+            result = self.manager.connection['col'].insert_one(data)
+
+        result = self.dao.get(
+            query=QuerySensorData(
+                end_date=datetime.datetime(2022, 7, 4, 21, 00, 00, 0),
+            )
+        )
+
+        mock.assert_called_once()
+        self.assertTrue(len(list(result)) == 0)
+
+    @ patch.object(MongoManager, 'closeMongoConnection', return_value=True)
+    @ patch.object(MongoManager, "find", return_value=[])
+    def test_query_none_raise_exception_ok(self, mock_find, mock):
         expected = "Database error [database_error] => 'NoneType' object has no attribute 'get_equal_values'"
 
-        with self.assertRaises(ExceptionDatabase) as context:
-            result = self.dao.get(
-                query=None
+        result = self.dao.get(
+            query=QuerySensorData(
+                controller_id=3,
+                humidity=30,
+                temperature=39,
+                start_date=datetime.datetime(2022, 7, 2, 21, 00, 00, 0),
+                end_date=datetime.datetime(2022, 7, 7, 21, 00, 00, 0),
             )
+        )
 
-        self.assertTrue(expected in str(context.exception))
+        mock_find.assert_called_once_with(
+            query={
+                'controller_id': {'$eq': 3},
+                'humidity': {'$gte': 30},
+                'temperature': {'$gte': 39},
+                'date': {
+                    '$gte': datetime.datetime(2022, 7, 2, 21, 00, 00, 0),
+                    '$lte': datetime.datetime(2022, 7, 7, 21, 00, 00, 0),
+                },
+            }
+        )
         mock.assert_called_once()
 
 

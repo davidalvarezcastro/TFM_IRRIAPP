@@ -1,4 +1,5 @@
 
+import typing
 import attr
 import pymongo
 
@@ -16,6 +17,11 @@ class MongoManager:
         col = db[self.collection]
 
         self.connection = {'connection': client, 'db': db, 'col': col}
+
+    def find(self, query: dict) -> typing.List[typing.Any]:
+        """Wrapper for mongodb find (helps with testing)
+        """
+        return self.connection['col'].find(query)
 
     def closeMongoConnection(self) -> None:
         try:

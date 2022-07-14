@@ -40,14 +40,19 @@ class SensorDataDAL(InterfaceSensorsHistoricDAL):
         query_mongo = {}
 
         try:
-            db = self.mongo.connection['col']
+            db = self.mongo
 
             # parse sensor query
             for value in query.get_equal_values():
                 query_mongo[value] = {
                     '$eq': getattr(query, value)
                 }
+            for value in query.get_greater_equals_than_values():
+                query_mongo[value] = {
+                    '$gte': getattr(query, value)
+                }
 
+            # special treatment for dates
             if query.start_date is not None:
                 if 'date' not in query_mongo:
                     query_mongo['date'] = {}
@@ -57,9 +62,11 @@ class SensorDataDAL(InterfaceSensorsHistoricDAL):
                 if 'date' not in query_mongo:
                     query_mongo['date'] = {}
 
-                query_mongo['date']['$lt'] = query.end_date
+                query_mongo['date']['$lte'] = query.end_date
 
-            aux = db.find(query_mongo)
+            aux = db.find(
+                query=query_mongo
+            )
 
             for data in aux:
                 result.append(

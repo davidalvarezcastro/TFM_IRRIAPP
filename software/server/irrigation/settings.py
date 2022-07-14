@@ -4,7 +4,7 @@ Settings files with variables used in the app
 from dotenv import load_dotenv, dotenv_values
 # dotenv_values("/var/oee_services/.env") con esto funciona....
 import os
-from globals import TIMEOUT, BACKOFF_FACTOR, REINTENTOS, FORMAT_DATES
+from globals import TIMEOUT, BACKOFF_FACTOR, REINTENTOS
 
 
 # load_dotenv()  # loading env variables
