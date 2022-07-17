@@ -26,6 +26,7 @@ class DALAreasUnitTest(unittest.TestCase):
 
     def setUp(self):
         self.id = 1
+        self.type = 1
         self.name = "name"
         self.description = "this is a dummy description"
         self.visible = True
@@ -34,6 +35,7 @@ class DALAreasUnitTest(unittest.TestCase):
 
         self.area = Area(
             id=self.id,
+            type=self.type,
             description=self.description,
             name=self.name,
             visible=self.visible,
@@ -188,6 +190,7 @@ class DALAreasUnitTest(unittest.TestCase):
         expected = [
             Area(
                 id=self.area_db.id,
+                type=self.area_db.type,
                 description=self.area_db.description,
                 name=self.area_db.name,
                 visible=self.area_db.visible,

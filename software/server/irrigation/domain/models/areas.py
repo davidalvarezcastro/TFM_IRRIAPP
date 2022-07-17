@@ -10,3 +10,4 @@ class Area():
     visible: bool = attr.ib(default=True)
     date: datetime = attr.ib(default=None)
     id: int = attr.ib(default=-1)
+    type: int = attr.ib(default=1)

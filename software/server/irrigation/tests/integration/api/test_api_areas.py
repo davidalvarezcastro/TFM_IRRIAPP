@@ -109,6 +109,7 @@ class ApiAreasIntegrationTest(ApiBaseIntegrationTest):
         }
 
         mockFilter.return_value = Area(
+            type=1,
             id=area,
             name="name1",
             description="old",
@@ -155,6 +156,7 @@ class ApiAreasIntegrationTest(ApiBaseIntegrationTest):
             side_effect=Exception(expected))
 
         mockFilter.return_value = Area(
+            type=1,
             name="name1",
             id=area,
             description="old"
@@ -206,6 +208,7 @@ class ApiAreasIntegrationTest(ApiBaseIntegrationTest):
         }
 
         mockFilter.return_value = Area(
+            type=1,
             id=area,
             name="name1",
             description="old",
@@ -235,6 +238,7 @@ class ApiAreasIntegrationTest(ApiBaseIntegrationTest):
         }
 
         mockFilter.return_value = Area(
+            type=1,
             id=area,
             name="name1",
             description="old",
@@ -264,6 +268,7 @@ class ApiAreasIntegrationTest(ApiBaseIntegrationTest):
             side_effect=Exception(expected))
 
         mockFilter.return_value = Area(
+            type=1,
             id=area,
             name="name1",
             description="old",
@@ -307,6 +312,7 @@ class ApiAreasIntegrationTest(ApiBaseIntegrationTest):
     def test_api_get_by_id_area_return_area_ok(self, mock):
         area = 10
         expected = Area(
+            type=1,
             id=area,
             name="name",
             description="old",
@@ -324,6 +330,7 @@ class ApiAreasIntegrationTest(ApiBaseIntegrationTest):
     def test_api_get_by_id_area_return_not_found_area_not_visible_ok(self, mock):
         area = 10
         expected = Area(
+            type=1,
             id=area,
             name="name",
             description="old",
@@ -365,12 +372,14 @@ class ApiAreasIntegrationTest(ApiBaseIntegrationTest):
     def test_api_get_all_area_return_array_ok(self, mock):
         expected = [
             Area(
+                type=1,
                 id=10,
                 name="name1",
                 description="old",
                 visible=1
             ),
             Area(
+                type=1,
                 id=1,
                 name="name2",
                 description="old",

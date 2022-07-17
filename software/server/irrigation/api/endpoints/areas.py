@@ -30,6 +30,7 @@ def add():
             new_area_id = ServiceAreas().insert(
                 area=Area(
                     name=new_type_data.get('name'),
+                    type=new_type_data.get('type'),
                     description=new_type_data.get('description'),
                     visible=new_type_data.get('visible'),
                 )

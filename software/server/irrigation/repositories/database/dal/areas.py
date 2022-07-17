@@ -13,6 +13,7 @@ class AreasDAL(InterfaceAreasDAL):
     def init_from_orm_to_model(result: AreasORM) -> Area:
         return Area(
             id=result.id,
+            type=result.type,
             name=result.name,
             description=result.description,
             visible=result.visible,
