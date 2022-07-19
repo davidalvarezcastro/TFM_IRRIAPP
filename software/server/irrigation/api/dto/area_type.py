@@ -4,7 +4,7 @@ from marshmallow import Schema, pre_load, fields
 
 
 class ApiAreaTypesSchema(Schema):
-    type = fields.Integer(
+    id = fields.Integer(
         allow_none=True,
         data_key='id',
         error_messages={

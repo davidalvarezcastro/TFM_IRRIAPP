@@ -2,6 +2,7 @@
 """
     area types dal tests
 """
+from sqlalchemy.exc import DatabaseError
 import os
 import unittest
 
@@ -41,10 +42,10 @@ class DALTypesUnitTest(unittest.TestCase):
 
     # TESTS
     @patch.object(TypesORM, 'add', return_value=True)
-    @patch.object(TypesORM, 'refresh', return_value=True)
-    @patch('repositories.database.models.TypesORM.query')
-    def test_insert_call_add_db_function_ok(self, mockFilter, mockRefresh, mock):
-        mockFilter.filter_by.return_value.first.return_value = None
+    @patch('repositories.database.dal.area_types.session_scope')
+    def test_insert_call_add_db_function_ok(self, mockFilter, mock):
+        mockFilter.return_value.__enter__.return_value.query.return_value.filter_by.return_value.first.return_value = \
+            None
 
         type_id = self.dal.insert(
             type=self.type
@@ -54,11 +55,12 @@ class DALTypesUnitTest(unittest.TestCase):
         self.assertEqual(type_id, self.type.id)
 
     @patch.object(TypesORM, 'add')
-    @patch('repositories.database.models.TypesORM.query')
+    @patch('repositories.database.dal.area_types.session_scope')
     def test_insert_call_add_db_function_raise_exception_ok(self, mockFilter, mock):
         mock.side_effect = Mock(
             side_effect=Exception('error'))
-        mockFilter.filter_by.return_value.first.return_value = None
+        mockFilter.return_value.__enter__.return_value.query.return_value.filter_by.return_value.first.return_value = \
+            None
 
         with self.assertRaises(ExceptionDatabase) as context:
             self.dal.insert(
@@ -69,9 +71,10 @@ class DALTypesUnitTest(unittest.TestCase):
         mock.assert_called_once()
 
     @patch.object(TypesORM, 'add', return_value=True)
-    @patch('repositories.database.models.TypesORM.query')
+    @patch('repositories.database.dal.area_types.session_scope')
     def test_insert_raise_exception_duplicated_type_ok(self, mockFilter, mock):
-        mockFilter.filter_by.return_value.first.return_value = self.type_db
+        mockFilter.return_value.__enter__.return_value.query.return_value.filter_by.return_value.first.return_value = \
+            self.type_db
 
         with self.assertRaises(ExceptionDatabase) as context:
             self.dal.insert(
@@ -83,9 +86,10 @@ class DALTypesUnitTest(unittest.TestCase):
         mock.assert_not_called()
 
     @patch.object(TypesORM, 'update', return_value=True)
-    @patch('repositories.database.models.TypesORM.query')
+    @patch('repositories.database.dal.area_types.session_scope')
     def test_update_call_update_db_function_ok(self, mockFilter, mock):
-        mockFilter.filter_by.return_value.first.return_value = self.type_db
+        mockFilter.return_value.__enter__.return_value.query.return_value.filter_by.return_value.first.return_value = \
+            self.type_db
 
         self.dal.update(
             type=self.type
@@ -94,11 +98,12 @@ class DALTypesUnitTest(unittest.TestCase):
         mock.assert_called_once()
 
     @patch.object(TypesORM, 'update')
-    @patch('repositories.database.models.TypesORM.query')
+    @patch('repositories.database.dal.area_types.session_scope')
     def test_update_call_update_db_function_raise_exception_ok(self, mockFilter, mock):
         mock.side_effect = Mock(
             side_effect=Exception('error'))
-        mockFilter.filter_by.return_value.first.return_value = self.type_db
+        mockFilter.return_value.__enter__.return_value.query.return_value.filter_by.return_value.first.return_value = \
+            self.type_db
 
         with self.assertRaises(ExceptionDatabase) as context:
             self.dal.update(
@@ -109,9 +114,10 @@ class DALTypesUnitTest(unittest.TestCase):
         mock.assert_called_once()
 
     @patch.object(TypesORM, 'add', return_value=True)
-    @patch('repositories.database.models.TypesORM.query')
+    @patch('repositories.database.dal.area_types.session_scope')
     def test_update_raise_exception_no_type_saved_ok(self, mockFilter, mock):
-        mockFilter.filter_by.return_value.first.return_value = None
+        mockFilter.return_value.__enter__.return_value.query.return_value.filter_by.return_value.first.return_value = \
+            None
 
         with self.assertRaises(ExceptionDatabase) as context:
             self.dal.update(
@@ -123,9 +129,10 @@ class DALTypesUnitTest(unittest.TestCase):
         mock.assert_not_called()
 
     @patch.object(TypesORM, 'delete', return_value=True)
-    @patch('repositories.database.models.TypesORM.query')
+    @patch('repositories.database.dal.area_types.session_scope')
     def test_delete_call_delete_db_function_ok(self, mockFilter, mock):
-        mockFilter.filter_by.return_value.first.return_value = self.type_db
+        mockFilter.return_value.__enter__.return_value.query.return_value.filter_by.return_value.first.return_value = \
+            self.type_db
 
         self.dal.delete(
             type=self.type
@@ -134,11 +141,12 @@ class DALTypesUnitTest(unittest.TestCase):
         mock.assert_called_once()
 
     @patch.object(TypesORM, 'delete')
-    @patch('repositories.database.models.TypesORM.query')
+    @patch('repositories.database.dal.area_types.session_scope')
     def test_delete_call_detele_db_function_raise_exception_ok(self, mockFilter, mock):
         mock.side_effect = Mock(
             side_effect=Exception('error'))
-        mockFilter.filter_by.return_value.first.return_value = None
+        mockFilter.return_value.__enter__.return_value.query.return_value.filter_by.return_value.first.return_value = \
+            None
 
         with self.assertRaises(ExceptionDatabase) as context:
             self.dal.delete(
@@ -149,9 +157,10 @@ class DALTypesUnitTest(unittest.TestCase):
         mock.assert_not_called()
 
     @patch.object(AreaTypesDAL, 'init_from_orm_to_model')
-    @patch('repositories.database.models.TypesORM.query')
+    @patch('repositories.database.dal.area_types.session_scope')
     def test_get_id_call_format_inner_function_ok(self, mockFilter, mock):
-        mockFilter.filter_by.return_value.first.return_value = self.type_db
+        mockFilter.return_value.__enter__.return_value.query.return_value.filter_by.return_value.first.return_value = \
+            self.type_db
 
         self.dal.get_by_id(
             type=self.id
@@ -160,9 +169,10 @@ class DALTypesUnitTest(unittest.TestCase):
         mock.assert_called_once()
 
     @patch.object(AreaTypesDAL, 'init_from_orm_to_model')
-    @patch('repositories.database.models.TypesORM.query')
+    @patch('repositories.database.dal.area_types.session_scope')
     def test_get_id_returns_none_ok(self, mockFilter, mock):
-        mockFilter.filter_by.return_value.first.return_value = None
+        mockFilter.return_value.__enter__.return_value.query.return_value.filter_by.return_value.first.return_value = \
+            None
 
         result = self.dal.get_by_id(
             type=self.id
@@ -171,9 +181,29 @@ class DALTypesUnitTest(unittest.TestCase):
         self.assertIsNone(result)
         mock.assert_not_called()
 
-    @patch('repositories.database.models.TypesORM.query')
+    @patch.object(AreaTypesDAL, 'init_from_orm_to_model')
+    @patch('repositories.database.dal.area_types.session_scope')
+    def test_get_id_returns_none_database_exception_ok(self, mockFilter, mock):
+        mockFilter.return_value.__enter__.return_value.query.return_value.filter_by.return_value.first.side_effect = \
+            Mock(
+                side_effect=DatabaseError(
+                    statement=None,
+                    params=None,
+                    orig=None,
+                    ismulti=False,
+                ))
+
+        result = self.dal.get_by_id(
+            type=self.id
+        )
+
+        self.assertIsNone(result)
+        mock.assert_not_called()
+
+    @patch('repositories.database.dal.area_types.session_scope')
     def test_get_all_returns_array_ok(self, mockFilter):
-        mockFilter.filter.return_value.all.return_value = [self.type_db]
+        mockFilter.return_value.__enter__.return_value.query.return_value.filter.return_value.all.return_value = [
+            self.type_db]
 
         result = self.dal.get_all()
         expected = [
@@ -185,9 +215,24 @@ class DALTypesUnitTest(unittest.TestCase):
 
         self.assertEqual(result, expected)
 
-    @patch('repositories.database.models.TypesORM.query')
+    @patch('repositories.database.dal.area_types.session_scope')
     def test_get_all_returns_empty_array_ok(self, mockFilter):
-        mockFilter.filter.return_value.all.return_value = []
+        mockFilter.return_value.__enter__.return_value.query.return_value.filter.return_value.all.return_value = []
+
+        result = self.dal.get_all()
+
+        self.assertTrue(len(result) == 0)
+
+    @patch('repositories.database.dal.area_types.session_scope')
+    def test_get_all_returns_empty_array_database_exception_ok(self, mockFilter):
+        mockFilter.return_value.__enter__.return_value.query.return_value.filter.return_value.all.side_effect = \
+            Mock(
+                side_effect=DatabaseError(
+                    statement=None,
+                    params=None,
+                    orig=None,
+                    ismulti=False,
+                ))
 
         result = self.dal.get_all()
 
