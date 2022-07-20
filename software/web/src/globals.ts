@@ -1,0 +1,3 @@
+
+export const TIMER_FETCH_AREAS = 600000;
+export const TIMER_FETCH_CONTROLLERS = 600000;
