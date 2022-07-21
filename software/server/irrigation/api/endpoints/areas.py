@@ -69,7 +69,10 @@ def update(area: int):
             raise Exception("Invalid request format data")
 
         try:
-            area_db = ServiceAreas().get_by_id(area=area)
+            area_db = ServiceAreas().get_by_id(
+                area=area,
+                all_visibility=True  # we want to find all areas
+            )
 
             if area_db is None:
                 status_code = http.HTTPStatus.NOT_FOUND
