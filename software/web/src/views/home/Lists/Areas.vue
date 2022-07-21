@@ -3,6 +3,7 @@ import { ref, Ref, defineEmits, PropType } from "vue";
 import { Area } from "../../../types/areas";
 import { Controller as Controller } from "../../../types/controllers";
 import CardArea from "../../../components/CardArea.vue";
+import swal from "sweetalert";
 
 name: "ListAreas";
 
@@ -63,7 +64,15 @@ const handleClickEdit = (area: Area, cb: () => void) => {
   emitEditArea(area, cb);
 };
 const handleClickDelete = (area: Area, cb: () => void) => {
-  emitDeleteArea(area, cb);
+  swal({
+    title: "Deleting Area",
+    text: "Are you sure you want to delete this area?",
+    icon: "warning",
+    buttons: ["Cancel", "OK"],
+    dangerMode: true,
+  }).then((value) => {
+    if (value) emitDeleteArea(area, cb);
+  });
 };
 
 const handleClickAddController = (area: Area) => {

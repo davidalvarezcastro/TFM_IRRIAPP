@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref, reactive, defineEmits, PropType, computed } from "vue";
 import { Controller } from "../../../types/controllers";
+import swal from "sweetalert";
 
 name: "ListControllers";
 
@@ -47,7 +48,15 @@ const handleClickDetail = (controller: Controller) => {
   emitDetailController(controller, () => {});
 };
 const handleClickDelete = (controller: Controller) => {
-  emitDeleteController(controller, () => {});
+  swal({
+    title: "Deleting Controller",
+    text: "Are you sure you want to delete this controller?",
+    icon: "warning",
+    buttons: ["Cancel", "OK"],
+    dangerMode: true,
+  }).then((value) => {
+    if (value) emitDeleteController(controller, () => {});
+  });
 };
 
 const getHeader = computed(() => {
