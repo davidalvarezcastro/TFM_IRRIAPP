@@ -40,7 +40,7 @@ export const getControllers = async (allVisibility: boolean = false): Promise<Co
 }
 
 export const postController = async (controller: Controller): Promise<number> => {
-    return axios.post<any, ResponsePPDController>(`${API_CONTROLLERS_POST.replace(':controller', controller.id.toString())}`, JSON.stringify(controller)).then((data) => {
+    return axios.post<any, ResponsePPDController>(`${API_CONTROLLERS_POST}`, controller).then((data) => {
         if (data) {
             if (data.status === "error") {
                 return Promise.reject(`Failed creating new controller: ${(data as unknown as ErrorResponse).message}`);
@@ -53,8 +53,8 @@ export const postController = async (controller: Controller): Promise<number> =>
     })
 }
 
-export const putController = async (controller: Controller): Promise<boolean> => {
-    return axios.post<any, ResponsePPDController>(`${API_CONTROLLERS_PUT.replace(':controller', controller.id.toString())}`, JSON.stringify(controller)).then((data) => {
+export const putController = async (controller: number, info: Controller): Promise<boolean> => {
+    return axios.put<any, ResponsePPDController>(`${API_CONTROLLERS_PUT.replace(':controller', controller.toString())}`, info).then((data) => {
 
         if (data) {
             if (data.status === "error") {
@@ -69,7 +69,7 @@ export const putController = async (controller: Controller): Promise<boolean> =>
 }
 
 export const deleteController = async (controller: number): Promise<boolean> => {
-    return axios.post<any, ResponsePPDController>(`${API_CONTROLLERS_DELETE.replace(':controller', controller.toString())}`).then((data) => {
+    return axios.delete<any, ResponsePPDController>(`${API_CONTROLLERS_DELETE.replace(':controller', controller.toString())}`).then((data) => {
 
         if (data) {
             if (data.status === "error") {

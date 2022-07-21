@@ -39,7 +39,7 @@ export const getAreas = async (allVisibility: boolean = false): Promise<Area[]> 
 }
 
 export const postArea = async (area: Area): Promise<number> => {
-    return axios.post<any, ResponsePPDArea>(`${API_AREAS_POST.replace(':area', area.id.toString())}`, JSON.stringify(area)).then((data) => {
+    return axios.post<any, ResponsePPDArea>(`${API_AREAS_POST}`, area).then((data) => {
         if (data) {
             if (data.status === "error") {
                 return Promise.reject(`Failed creating new area: ${(data as unknown as ErrorResponse).message}`);
@@ -52,8 +52,8 @@ export const postArea = async (area: Area): Promise<number> => {
     })
 }
 
-export const putArea = async (area: Area): Promise<boolean> => {
-    return axios.post<any, ResponsePPDArea>(`${API_AREAS_PUT.replace(':area', area.id.toString())}`, JSON.stringify(area)).then((data) => {
+export const putArea = async (area: number, info: Area): Promise<boolean> => {
+    return axios.put<any, ResponsePPDArea>(`${API_AREAS_PUT.replace(':area', area.toString())}`, info).then((data) => {
 
         if (data) {
             if (data.status === "error") {
@@ -68,7 +68,7 @@ export const putArea = async (area: Area): Promise<boolean> => {
 }
 
 export const deleteArea = async (area: number): Promise<boolean> => {
-    return axios.post<any, ResponsePPDArea>(`${API_AREAS_DELETE.replace(':area', area.toString())}`).then((data) => {
+    return axios.delete<any, ResponsePPDArea>(`${API_AREAS_DELETE.replace(':area', area.toString())}`).then((data) => {
 
         if (data) {
             if (data.status === "error") {

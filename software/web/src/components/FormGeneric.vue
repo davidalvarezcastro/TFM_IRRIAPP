@@ -1,8 +1,17 @@
 <script setup lang="ts">
-import { ref, Ref, defineEmits, PropType, reactive, computed } from "vue";
+import {
+  ref,
+  Ref,
+  defineEmits,
+  PropType,
+  reactive,
+  computed,
+  watch,
+} from "vue";
 import { Area } from "../types/areas";
 import { AreaType } from "../types/area_types";
 import { Controller } from "../types/controllers";
+import { empty } from "../utils/index";
 
 name: "FormGeneric";
 
@@ -19,19 +28,9 @@ const props = defineProps({
     default: null,
   },
   types: {
-    type: Object as PropType<AreaType>,
+    type: Array as PropType<AreaType[]>,
     required: true,
   },
-});
-
-const valid = ref(true);
-const formName = ref(null);
-const form = reactive({
-  name: null,
-  description: null,
-  key: "", // only for controllers
-  type: null, // only for areas
-  visible: null,
 });
 
 const update = computed((): boolean => {
@@ -41,6 +40,49 @@ const element = computed((): string => {
   return props.area ? "area" : "controller";
 });
 
+/**
+ * Emit events
+ */
+const emit = defineEmits<{
+  (e: "addArea", area: Area, cb: () => void): void;
+  (e: "updateArea", area: Area, cb: () => void): void;
+  (e: "addController", controller: Controller, cb: () => void): void;
+  (e: "updateController", controller: Controller, cb: () => void): void;
+}>();
+
+// areas
+const emitAddArea = function (area: Area, cb: () => void) {
+  emit("addArea", area, cb);
+};
+const emitUpdateArea = function (area: Area, cb: () => void) {
+  emit("updateArea", area, cb);
+};
+// controllers
+const emitAddController = function (controller: Controller, cb: () => void) {
+  emit("addController", controller, cb);
+};
+const emitUpdateController = function (controller: Controller, cb: () => void) {
+  emit("updateController", controller, cb);
+};
+
+/**
+ * Form data
+ */
+const submitting = ref(false);
+
+const valid = ref(true);
+const formName = ref(null);
+const form = reactive({
+  name: null,
+  description: null,
+  key: "", // only for controllers
+  type: null, // only for areas
+  visible: false,
+});
+
+const getHintSelect = computed((): string => {
+  return form.type !== null ? `Type ${form.type}` : "";
+});
 const getTextVisible = computed((): string => {
   return `Make ${element.value} visible?`;
 });
@@ -52,32 +94,99 @@ const getTextButtonSubmit = computed((): string => {
 const getIconButtonSubmit = computed((): string => {
   return update.value ? "mdi-pencil" : "mdi-plus";
 });
-const getTextButtonDelete = computed((): string => {
-  // return `Remove ${element.value}`;
-  return `Remove`;
+
+const disabledSubmit = computed((): boolean => {
+  return update.value
+    ? !checkChangesUpdate()
+    : empty(form.name) ||
+        empty(form.description) ||
+        (props.area ? empty(form.type) : false);
 });
 
 const validate = () => {
   formName.value.validate();
 };
+
+const checkChangesUpdate = (): boolean => {
+  return (
+    form.name !== props.data.name ||
+    form.description !== props.data.description ||
+    form.visible !== props.data.visible ||
+    (props.area ? form.type !== props.data.type : false)
+  );
+};
+
 const submit = () => {
-  console.log("submit");
+  validate();
+
+  const cb = () => {
+    submitting.value = false;
+  };
+
+  if (valid.value) {
+    submitting.value = true;
+    if (props.area) {
+      let areaL = {
+        description: form.description,
+        type: form.type,
+        visible: form.visible,
+      } as Area;
+      if (update.value) {
+        emitUpdateArea(areaL, cb);
+      } else {
+        areaL.name = form.name;
+        emitAddArea(areaL, cb);
+      }
+    } else {
+      const controllerL = {
+        description: form.description,
+        visible: form.visible,
+      } as Controller;
+      if (update.value) {
+        emitUpdateController(controllerL, cb);
+      } else {
+        controllerL.name = form.name;
+        emitAddController(controllerL, cb);
+      }
+    }
+  }
 };
-const remove = () => {
-  console.log("remove");
-};
+
 const reset = () => {
-  formName.value.reset();
-  console.log("reset");
+  if (update.value) {
+    updateDataForm();
+  } else {
+    formName.value.reset();
+  }
 };
+
+/**
+ * Component
+ */
+const updateDataForm = () => {
+  form.name = props.data.name;
+  form.description = props.data.description;
+  form.visible = props.data.visible;
+  if (props.area) form.type = props.data.type;
+};
+
+watch(
+  props.data,
+  (newValue, oldValue) => {
+    if (newValue !== undefined && newValue !== null) {
+      updateDataForm();
+    }
+  },
+  { immediate: true, deep: true }
+);
 </script>
 
 <template>
   <v-form class="form" ref="formName" v-model="valid" lazy-validation>
     <v-text-field
+      v-if="!update"
       v-model="form.name"
       :counter="10"
-      :rules="nameRules"
       label="Name"
       required
     ></v-text-field>
@@ -91,15 +200,19 @@ const reset = () => {
       v-model="form.description"
     ></v-textarea>
 
-    <!-- <v-select
-      v-model="select"
-      :items="items"
-      :rules="[(v) => !!v || 'Item is required']"
-      label="Item"
-      required
-    ></v-select> -->
+    <v-select
+      v-if="area"
+      v-model="form.type"
+      :hint="getHintSelect"
+      :items="types"
+      item-title="description"
+      item-value="id"
+      label="Area Type"
+      persistent-hint
+      single-line
+    />
 
-    <v-checkbox v-model="checkbox" :label="getTextVisible"></v-checkbox>
+    <v-checkbox v-model="form.visible" :label="getTextVisible"></v-checkbox>
 
     <div class="operations">
       <v-btn color="grey" class="mr-4" prepend-icon="mdi-reload" @click="reset">
@@ -107,19 +220,10 @@ const reset = () => {
       </v-btn>
 
       <v-btn
-        v-if="update"
-        color="error"
-        class="mr-4"
-        prepend-icon="mdi-delete"
-        @click="remove"
-      >
-        {{ getTextButtonDelete }}
-      </v-btn>
-
-      <v-btn
         color="success"
         :prepend-icon="getIconButtonSubmit"
         @click="submit"
+        :disabled="disabledSubmit"
       >
         {{ getTextButtonSubmit }}
       </v-btn>

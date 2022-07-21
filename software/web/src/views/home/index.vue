@@ -1,13 +1,27 @@
 <script setup lang="ts">
 import { ref, onMounted, Ref, computed } from "vue";
-import { getAreas } from "../../api/services/areas";
-import { getControllers } from "../../api/services/controllers";
+import {
+  getAreas,
+  postArea,
+  putArea,
+  deleteArea,
+} from "../../api/services/areas";
+import {
+  getControllers,
+  postController,
+  putController,
+  deleteController,
+} from "../../api/services/controllers";
+import { getAreaTypes } from "../../api/services/area_types";
 import { Area } from "../../types/areas";
+import { AreaType } from "../../types/area_types";
 import { Controller } from "../../types/controllers";
 import { TIMER_FETCH_AREAS, TIMER_FETCH_CONTROLLERS } from "../../globals";
 import ListAreas from "./Lists/Areas.vue";
 import ListControllers from "./Lists/Controllers.vue";
 import FormGeneric from "../../components/FormGeneric.vue";
+import { debug } from "../../utils/index";
+import { notify } from "@kyvg/vue3-notification";
 
 let areas: Ref<Area[]> = ref([]);
 let timerAreas: ReturnType<typeof setInterval> | Ref<null> = ref(null);
@@ -21,13 +35,28 @@ const fetchControllers = async () => {
   controllers.value = await getControllers(true); // changes with auth
 };
 
+let types: Ref<AreaType[]> = ref([]);
+const fetchAreaTypes = async () => {
+  types.value = await getAreaTypes();
+};
+
 onMounted(async () => {
+  fetchAreaTypes();
+
   fetchAreas();
   timerAreas = setInterval(fetchAreas, TIMER_FETCH_AREAS);
 
   fetchControllers();
   timerControllers = setInterval(fetchControllers, TIMER_FETCH_CONTROLLERS);
 });
+
+const handleError = (title, error) => {
+  notify({
+    title: title,
+    text: error,
+    type: "error",
+  });
+};
 
 /**
  * Table Controllers
@@ -46,7 +75,8 @@ const handleClickAddArea = () => {
   isAreaForm.value = true;
   title.value = "New Area";
   dataForm.value = null;
-  console.log("handleClickAddArea");
+  areaController.value = null;
+  debug("handleClickAddArea", "");
 };
 const handleClickExpand = (area: Area, cb: () => void) => {
   selectedAreas.value.push(area.id);
@@ -56,40 +86,169 @@ const handleClickEditArea = (area: Area, cb: () => void) => {
   isAreaForm.value = true;
   title.value = `Update area '${area.name}'`;
   dataForm.value = area;
-  console.log("handleClickEditArea", area);
-};
-const handleClickDeleteArea = (area: Area, cb: () => void) => {
-  console.log("handleClickDeleteArea", area);
+  areaController.value = null;
+  debug("handleClickEditArea", JSON.stringify(area));
 };
 
-const handleClickAddController = () => {
+const handleClickAddController = (area: Area) => {
   dialog.value = true;
   isAreaForm.value = false;
   title.value = "New Controller";
   dataForm.value = null;
-  console.log("handleClickAddController");
+  areaController.value = area.id;
+  debug("handleClickAddController", "");
 };
 const handleClickEditController = (controller: Controller, cb: () => void) => {
   dialog.value = true;
   isAreaForm.value = false;
   title.value = `Update controller '${controller.name}'`;
   dataForm.value = controller;
-  console.log("handleClickEditController", controller);
+  areaController.value = null;
+  debug("handleClickEditController", JSON.stringify(controller));
 };
 const handleClickDetailController = (
   controller: Controller,
   cb: () => void
 ) => {
-  console.log("handleClickDetailController", controller);
+  areaController.value = null;
+  debug("handleClickDetailController", JSON.stringify(controller));
 };
-const handleClickDeleteController = (
-  controller: Controller,
-  cb: () => void
-) => {
-  console.log("handleClickDeleteController", controller);
+
+/**
+ * Areas/Controller api call methods
+ */
+const addArea = async (area: Area, cb: () => void) => {
+  const title = "Adding Area";
+  debug("addArea", `${title} ${JSON.stringify(area)}`);
+
+  try {
+    let added = await postArea(area);
+    dialog.value = false;
+    fetchAreas();
+    notify({
+      title: title,
+      text: `Area ${added} added!`,
+      type: "success",
+    });
+  } catch (error) {
+    handleError(title, error);
+  }
+
+  cb();
+};
+const updateArea = async (area: Area, cb: () => void) => {
+  const title = "Updating Area";
+  debug("updateArea", `${title} ${JSON.stringify(area)}`);
+
+  try {
+    let updated = await putArea(dataForm.value.id, area);
+    dialog.value = false;
+    fetchAreas();
+    notify({
+      title: title,
+      text: `Area ${dataForm.value.id} updated!`,
+      type: "success",
+    });
+  } catch (error) {
+    handleError(title, error);
+  }
+
+  cb();
+};
+const removeArea = async (area: Area, cb: () => void) => {
+  const title = "Removing Area";
+  debug("removeArea", `${title} ${JSON.stringify(area)}`);
+
+  try {
+    let deleted = await deleteArea(area.id);
+
+    if (deleted) {
+      fetchAreas();
+      notify({
+        title: title,
+        text: `Area ${area.id} deleted!`,
+        type: "success",
+      });
+    } else {
+      throw "Something wrong happened!";
+    }
+  } catch (error) {
+    handleError(title, error);
+  }
+
+  cb();
+};
+
+const addController = async (controller: Controller, cb: () => void) => {
+  const title = "Adding Controller";
+  debug("addController", `${title} ${JSON.stringify(controller)}`);
+
+  try {
+    // it is necessary to specify the area to which the new controller belongs
+    if (areaController.value === null) {
+      throw "No area selected!";
+    }
+
+    controller.area = areaController.value;
+    let added = await postController(controller);
+    dialog.value = false;
+    fetchControllers();
+    notify({
+      title: title,
+      text: `Controller ${added} added!`,
+      type: "success",
+    });
+  } catch (error) {
+    handleError(title, error);
+  }
+
+  cb();
+};
+const updateController = async (controller: Controller, cb: () => void) => {
+  const title = "Updating Controller";
+  debug("updateController", `${title} ${JSON.stringify(controller)}`);
+
+  try {
+    let updated = await putController(dataForm.value.id, controller);
+    dialog.value = false;
+    fetchControllers();
+    notify({
+      title: title,
+      text: `Controller ${dataForm.value.id} updated!`,
+      type: "success",
+    });
+  } catch (error) {
+    handleError(title, error);
+  }
+
+  cb();
+};
+const removeController = async (controller: Controller, cb: () => void) => {
+  const title = "Removing Controller";
+  debug("removeController", `${title} ${JSON.stringify(controller)}`);
+
+  try {
+    let deleted = await deleteController(controller.id);
+
+    if (deleted) {
+      fetchControllers();
+      notify({
+        title: title,
+        text: `Controller ${controller.id} deleted!`,
+        type: "success",
+      });
+    } else {
+      throw "Something wrong happened!";
+    }
+  } catch (error) {
+    handleError(title, error);
+  }
+
+  cb();
 };
 
 const controllersHeaders = ref([
+  { id: "visible", text: "" },
   { id: "id", text: "Controller" },
   { id: "name", text: "Name" },
   { id: "description", text: "Description" },
@@ -100,6 +259,7 @@ let dialog = ref(false);
 let isAreaForm = ref(false);
 let title = ref("");
 let dataForm: Ref<Area | Controller | null> = ref(null);
+let areaController: Ref<number | null> = ref(null);
 </script>
 
 <template>
@@ -122,7 +282,7 @@ let dataForm: Ref<Area | Controller | null> = ref(null);
       v-on:expanded="handleClickExpand"
       v-on:addController="handleClickAddController"
       v-on:editArea="handleClickEditArea"
-      v-on:deleteArea="handleClickDeleteArea"
+      v-on:deleteArea="removeArea"
     >
       <template
         v-for="area in selectedAreas"
@@ -134,7 +294,7 @@ let dataForm: Ref<Area | Controller | null> = ref(null);
           :controllers="getControllersFromArea(area)"
           v-on:editController="handleClickEditController"
           v-on:detailController="handleClickDetailController"
-          v-on:deleteController="handleClickDeleteController"
+          v-on:deleteController="removeController"
         />
       </template>
     </ListAreas>
@@ -150,7 +310,15 @@ let dataForm: Ref<Area | Controller | null> = ref(null);
         </v-card-title>
 
         <v-card-text>
-          <FormGeneric :area="isAreaForm" :data="dataForm" :types="[]" />
+          <FormGeneric
+            :area="isAreaForm"
+            :data="dataForm"
+            :types="types"
+            v-on:addArea="addArea"
+            v-on:updateArea="updateArea"
+            v-on:addController="addController"
+            v-on:updateController="updateController"
+          />
         </v-card-text>
       </v-card>
     </v-dialog>

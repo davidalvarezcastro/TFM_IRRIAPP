@@ -83,7 +83,18 @@ const getHeader = computed(() => {
             :key="`controller-${controller.name}-${h.text}`"
             class="text-center"
           >
-            {{ controller[h.id] }}
+            <span v-if="h.id !== 'visible'">
+              {{ controller[h.id] }}
+            </span>
+
+            <span v-else>
+              <v-icon v-if="controller.visible" class="icon" large color="grey">
+                mdi-eye
+              </v-icon>
+              <v-icon v-else class="icon" large color="grey">
+                mdi-eye-off
+              </v-icon>
+            </span>
           </td>
           <td class="text-center operations">
             <v-btn
