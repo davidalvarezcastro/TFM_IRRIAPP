@@ -1,0 +1,14 @@
+marshmallow==3.14.1
+requests==2.27.1
+Flask==2.0.3
+Flask-Cors==3.0.10
+flask_restx
+Flask-Script==2.0.6
+peewee_db_evolve==3.7.6
+app==0.0.1
+PyJWT==2.4.0
+python-dotenv==0.20.0
+gunicorn==20.1.0
+PyMySQL==1.0.2
+peewee==3.15.0
+peewee-migrations==0.3.32
