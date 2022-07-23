@@ -13,6 +13,9 @@ SQL_CREATE_DATABASE = "CREATE DATABASE IF NOT EXISTS {database}"
 SQL_GRANT_DATABASE = "GRANT ALL PRIVILEGES ON {database}.* TO {user}@\"%\""
 SQL_INSERT_ADMIN = "INSERT IGNORE INTO `{database}`.`usuarios` (`id_user`, `username`, `password`, `email`, `es_admin`, `activo`, `salt`) VALUES \
     ('1', 'admin', '{password}', 'admin@irrigation.gal', '1', '1', '{salt}');"
+# just for testing, comment when deploying
+SQL_INSERT_GUEST = "INSERT IGNORE INTO `{database}`.`usuarios` (`id_user`, `username`, `password`, `email`, `es_admin`, `activo`, `salt`) VALUES \
+    ('1', 'guest', '{password}', 'admin@irrigation.gal', '1', '1', '{salt}');"
 
 
 def execute_query(query: str) -> None:
@@ -49,6 +52,15 @@ execute_query(
     SQL_INSERT_ADMIN.format(
         database=db_settings.DATABASE,
         password=encode_password(db_settings.USER_ADMIN_PASSWORD, salt),
+        salt=salt
+    )
+)
+# añadimos usuario guest
+salt = generate_salt()
+execute_query(
+    SQL_INSERT_GUEST.format(
+        database=db_settings.DATABASE,
+        password=encode_password("guest", salt),
         salt=salt
     )
 )

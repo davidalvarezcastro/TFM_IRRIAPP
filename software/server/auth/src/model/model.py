@@ -2,7 +2,7 @@
 """ Modelos de la aplicación del Control de Flota
 """
 from peewee import MySQLDatabase, AutoField, CharField, BooleanField, \
-                   ForeignKeyField, DateTimeField, SQL, Model
+    ForeignKeyField, DateTimeField, SQL, Model
 from src.config import db_settings
 
 database = MySQLDatabase(db_settings.DATABASE, **{

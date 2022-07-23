@@ -44,6 +44,8 @@ services:
       - ${BROKER_WEBPORT_BINDED:-8884}:${BROKER_WEBPORT:-8884}
     logging:
       driver: none
+    depends_on:
+      - database-server
 
   mongodb:
     image: mongo:4.4
@@ -69,12 +71,12 @@ services:
         max-file: "3"
 
   # api auth
-  server-auth:
-    container_name: irrigation_auth
+  auth:
+    container_name: ${AUTH_HOST:-irrigation_auth}
     networks:
       default:
         aliases:
-          - irrigation_auth
+          - ${AUTH_HOST:-irrigation_auth}
     build:
       context: .
       dockerfile: ./config/docker/oauth_users.Dockerfile
@@ -84,10 +86,8 @@ services:
     restart: always
     ports:
       - ${AUTH_API_PORT}:5000
-    mem_limit: 1500m
-    memswap_limit: 100m
-    cpus: 1.0
-    cpu_shares: 614
+    depends_on:
+      - database-server
     # logging:
     #   driver: "none"
 
@@ -133,6 +133,8 @@ services:
       - ./server/irrigation/requirements.txt:/irrigation/requirements.txt
     ports:
       - ${API_PORT}:5000
+    depends_on:
+      - database-server
 
   recollector:
     container_name: irrigation_recollector
@@ -153,3 +155,7 @@ services:
       - ./logs:/irrigation/logs
       - ./.env:/irrigation/.env
       - ./server/irrigation/requirements.txt:/irrigation/requirements.txt
+    depends_on:
+    - database-server
+    - api
+    - mongodb

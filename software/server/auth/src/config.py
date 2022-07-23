@@ -38,13 +38,13 @@ class SettingsAPI:
 
 
 class SettingsDatabase:
-    HOST: str = os.getenv('DB_HOST', 'localhost')
+    HOST: str = "192.168.1.135"
     PORT: int = int(os.getenv('DB_PORT', 3306))
     USER: str = os.getenv('DB_USER', 'user')
     PASSWORD: str = os.getenv('DB_PASS', 'shhhh it is a secret!')
-    ROOT_USER: str = os.getenv('DB_ROOT_USER', 'admin')
+    ROOT_USER: str = "root"
     ROOT_PASSWORD: str = os.getenv('DB_ROOT_PASS', 'shhhh it is also a secret!')
-    DATABASE: str = os.getenv('DB_DATABASE_IRRIGATION', 'usuarios')
+    DATABASE: str = os.getenv('DB_DATABASE_AUTH', 'auth')
     USER_ADMIN_PASSWORD: str = os.getenv('USER_ADMIN_PASS', 'shhhh it is also a secret!')
 
 

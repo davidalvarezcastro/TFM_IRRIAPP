@@ -1,6 +1,6 @@
 # auto-generated snapshot
 from peewee import AutoField, CharField, BooleanField, \
-                   DateTimeField, SQL, Model
+    DateTimeField, SQL, Model
 
 snapshot = Snapshot()
 
@@ -14,6 +14,7 @@ class Usuarios(Model):
     es_admin = BooleanField(constraints=[SQL("DEFAULT '0'")])
     activo = BooleanField(constraints=[SQL("DEFAULT '0'")])
     salt = CharField(max_length=50, null=True)
+
     class Meta:
         table_name = "usuarios"
 
@@ -22,9 +23,10 @@ class Usuarios(Model):
 class Tokens(Model):
     id_token = AutoField(primary_key=True)
     token = CharField(constraints=[SQL("DEFAULT '0'")], max_length=300, null=True)
-    id_user = snapshot.ForeignKeyField(column_name='id_user', constraints=[SQL('DEFAULT 0')], index=True, model='usuarios', null=True)
+    id_user = snapshot.ForeignKeyField(
+        column_name='id_user', constraints=[SQL('DEFAULT 0')],
+        index=True, model='usuarios', null=True)
     date = DateTimeField(constraints=[SQL('DEFAULT current_timestamp()')])
+
     class Meta:
         table_name = "tokens"
-
-
