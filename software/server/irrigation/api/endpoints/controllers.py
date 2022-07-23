@@ -69,7 +69,10 @@ def update(controller: int):
             raise Exception("Invalid request format data")
 
         try:
-            controller_db = ServiceControllers().get_by_id(controller=controller)
+            controller_db = ServiceControllers().get_by_id(
+                controller=controller,
+                all_visibility=True
+            )
 
             if controller_db is None:
                 status_code = http.HTTPStatus.NOT_FOUND

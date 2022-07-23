@@ -2,6 +2,7 @@
 """
     controllers dal tests
 """
+from sqlalchemy.exc import DatabaseError
 import datetime
 import json
 import os
@@ -56,10 +57,10 @@ class DALControllersUnitTest(unittest.TestCase):
 
     # TESTS
     @patch.object(ControllersORM, 'add', return_value=True)
-    @patch.object(ControllersORM, 'refresh', return_value=True)
-    @patch('repositories.database.models.ControllersORM.query')
-    def test_insert_call_add_db_function_ok(self, mockFilter, mockRefresh, mock):
-        mockFilter.filter_by.return_value.first.return_value = None
+    @patch('repositories.database.dal.controllers.session_scope')
+    def test_insert_call_add_db_function_ok(self, mockFilter, mock):
+        mockFilter.return_value.__enter__.return_value.query.return_value.filter_by.return_value.first.return_value = \
+            None
 
         controller_id = self.dal.insert(
             controller=self.controller
@@ -69,11 +70,12 @@ class DALControllersUnitTest(unittest.TestCase):
         self.assertEqual(controller_id, self.controller.id)
 
     @patch.object(ControllersORM, 'add')
-    @patch('repositories.database.models.ControllersORM.query')
+    @patch('repositories.database.dal.controllers.session_scope')
     def test_insert_call_add_db_function_raise_exception_ok(self, mockFilter, mock):
         mock.side_effect = Mock(
             side_effect=Exception('error'))
-        mockFilter.filter_by.return_value.first.return_value = None
+        mockFilter.return_value.__enter__.return_value.query.return_value.filter_by.return_value.first.return_value = \
+            None
 
         with self.assertRaises(ExceptionDatabase) as context:
             self.dal.insert(
@@ -84,9 +86,10 @@ class DALControllersUnitTest(unittest.TestCase):
         mock.assert_called_once()
 
     @patch.object(ControllersORM, 'add', return_value=True)
-    @patch('repositories.database.models.ControllersORM.query')
+    @patch('repositories.database.dal.controllers.session_scope')
     def test_insert_raise_exception_duplicated_type_ok(self, mockFilter, mock):
-        mockFilter.filter_by.return_value.first.return_value = self.controller_db
+        mockFilter.return_value.__enter__.return_value.query.return_value.filter_by.return_value.first.return_value = \
+            self.controller_db
 
         with self.assertRaises(ExceptionDatabase) as context:
             self.dal.insert(
@@ -98,9 +101,10 @@ class DALControllersUnitTest(unittest.TestCase):
         mock.assert_not_called()
 
     @patch.object(ControllersORM, 'update', return_value=True)
-    @patch('repositories.database.models.ControllersORM.query')
+    @patch('repositories.database.dal.controllers.session_scope')
     def test_update_call_update_db_function_ok(self, mockFilter, mock):
-        mockFilter.filter_by.return_value.first.return_value = self.controller_db
+        mockFilter.return_value.__enter__.return_value.query.return_value.filter_by.return_value.first.return_value = \
+            self.controller_db
 
         self.dal.update(
             controller=self.controller
@@ -109,11 +113,12 @@ class DALControllersUnitTest(unittest.TestCase):
         mock.assert_called_once()
 
     @patch.object(ControllersORM, 'update')
-    @patch('repositories.database.models.ControllersORM.query')
+    @patch('repositories.database.dal.controllers.session_scope')
     def test_update_call_update_db_function_raise_exception_ok(self, mockFilter, mock):
         mock.side_effect = Mock(
             side_effect=Exception('error'))
-        mockFilter.filter_by.return_value.first.return_value = self.controller_db
+        mockFilter.return_value.__enter__.return_value.query.return_value.filter_by.return_value.first.return_value = \
+            self.controller_db
 
         with self.assertRaises(ExceptionDatabase) as context:
             self.dal.update(
@@ -124,9 +129,10 @@ class DALControllersUnitTest(unittest.TestCase):
         mock.assert_called_once()
 
     @patch.object(ControllersORM, 'add', return_value=True)
-    @patch('repositories.database.models.ControllersORM.query')
+    @patch('repositories.database.dal.controllers.session_scope')
     def test_update_raise_exception_no_type_saved_ok(self, mockFilter, mock):
-        mockFilter.filter_by.return_value.first.return_value = None
+        mockFilter.return_value.__enter__.return_value.query.return_value.filter_by.return_value.first.return_value = \
+            None
 
         with self.assertRaises(ExceptionDatabase) as context:
             self.dal.update(
@@ -138,9 +144,10 @@ class DALControllersUnitTest(unittest.TestCase):
         mock.assert_not_called()
 
     @patch.object(ControllersORM, 'delete', return_value=True)
-    @patch('repositories.database.models.ControllersORM.query')
+    @patch('repositories.database.dal.controllers.session_scope')
     def test_delete_call_delete_db_function_ok(self, mockFilter, mock):
-        mockFilter.filter_by.return_value.first.return_value = self.controller_db
+        mockFilter.return_value.__enter__.return_value.query.return_value.filter_by.return_value.first.return_value = \
+            self.controller_db
 
         self.dal.delete(
             controller=self.controller
@@ -149,11 +156,12 @@ class DALControllersUnitTest(unittest.TestCase):
         mock.assert_called_once()
 
     @patch.object(ControllersORM, 'delete')
-    @patch('repositories.database.models.ControllersORM.query')
+    @patch('repositories.database.dal.controllers.session_scope')
     def test_delete_call_detele_db_function_raise_exception_ok(self, mockFilter, mock):
         mock.side_effect = Mock(
             side_effect=Exception('error'))
-        mockFilter.filter_by.return_value.first.return_value = None
+        mockFilter.return_value.__enter__.return_value.query.return_value.filter_by.return_value.first.return_value = \
+            None
 
         with self.assertRaises(ExceptionDatabase) as context:
             self.dal.delete(
@@ -164,9 +172,10 @@ class DALControllersUnitTest(unittest.TestCase):
         mock.assert_not_called()
 
     @patch.object(ControllersDAL, 'init_from_orm_to_model')
-    @patch('repositories.database.models.ControllersORM.query')
+    @patch('repositories.database.dal.controllers.session_scope')
     def test_get_id_call_format_inner_function_ok(self, mockFilter, mock):
-        mockFilter.filter_by.return_value.first.return_value = self.controller_db
+        mockFilter.return_value.__enter__.return_value.query.return_value.filter_by.return_value.first.return_value = \
+            self.controller_db
 
         self.dal.get_by_id(
             controller=self.id
@@ -175,9 +184,10 @@ class DALControllersUnitTest(unittest.TestCase):
         mock.assert_called_once()
 
     @patch.object(ControllersDAL, 'init_from_orm_to_model')
-    @patch('repositories.database.models.ControllersORM.query')
+    @patch('repositories.database.dal.controllers.session_scope')
     def test_get_id_returns_none_ok(self, mockFilter, mock):
-        mockFilter.filter_by.return_value.first.return_value = None
+        mockFilter.return_value.__enter__.return_value.query.return_value.filter_by.return_value.first.return_value = \
+            None
 
         result = self.dal.get_by_id(
             controller=self.id
@@ -186,9 +196,29 @@ class DALControllersUnitTest(unittest.TestCase):
         self.assertIsNone(result)
         mock.assert_not_called()
 
-    @patch('repositories.database.models.ControllersORM.query')
+    @patch.object(ControllersDAL, 'init_from_orm_to_model')
+    @patch('repositories.database.dal.controllers.session_scope')
+    def test_get_id_returns_none_database_exception_ok(self, mockFilter, mock):
+        mockFilter.return_value.__enter__.return_value.query.return_value.filter_by.return_value.first.side_effect = \
+            Mock(
+                side_effect=DatabaseError(
+                    statement=None,
+                    params=None,
+                    orig=None,
+                    ismulti=False,
+                ))
+
+        result = self.dal.get_by_id(
+            controller=self.id
+        )
+
+        self.assertIsNone(result)
+        mock.assert_not_called()
+
+    @patch('repositories.database.dal.controllers.session_scope')
     def test_get_all_returns_array_ok(self, mockFilter):
-        mockFilter.filter_by.return_value.all.return_value = [self.controller_db]
+        mockFilter.return_value.__enter__.return_value.query.return_value.filter_by.return_value.all.return_value = [
+            self.controller_db]
 
         result = self.dal.get_all()
         expected = [
@@ -205,9 +235,24 @@ class DALControllersUnitTest(unittest.TestCase):
 
         self.assertEqual(result, expected)
 
-    @patch('repositories.database.models.ControllersORM.query')
+    @patch('repositories.database.dal.controllers.session_scope')
     def test_get_all_returns_empty_array_ok(self, mockFilter):
-        mockFilter.filter_by.return_value.all.return_value = []
+        mockFilter.return_value.__enter__.return_value.query.return_value.filter_by.return_value.all.return_value = []
+
+        result = self.dal.get_all()
+
+        self.assertTrue(len(result) == 0)
+
+    @patch('repositories.database.dal.controllers.session_scope')
+    def test_get_all_returns_empty_array_database_exception_ok(self, mockFilter):
+        mockFilter.return_value.__enter__.return_value.query.return_value.filter_by.return_value.all.side_effect = \
+            Mock(
+                side_effect=DatabaseError(
+                    statement=None,
+                    params=None,
+                    orig=None,
+                    ismulti=False,
+                ))
 
         result = self.dal.get_all()
 

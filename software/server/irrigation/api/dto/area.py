@@ -18,6 +18,12 @@ class ApiAreasSchema(Schema):
         error_messages={
             'invalid': '`id` must be an Integer.'
         })
+    type = fields.Integer(
+        allow_none=True,
+        data_key='type',
+        error_messages={
+            'invalid': '`type` must be an Integer.'
+        })
     name = fields.String(
         data_key='name',
         error_messages={
@@ -42,8 +48,8 @@ class ApiAreasSchema(Schema):
             'invalid': '`date` must be a String.'
         })
 
-    POST_FIELDS = [name.data_key, description.data_key, visible.data_key]
-    PUT_FIELDS = [description.data_key, visible.data_key]
+    POST_FIELDS = [type.data_key, name.data_key, description.data_key, visible.data_key]
+    PUT_FIELDS = [type.data_key, description.data_key, visible.data_key]
 
     @pre_load
     def check_context(self, data, **kwargs):

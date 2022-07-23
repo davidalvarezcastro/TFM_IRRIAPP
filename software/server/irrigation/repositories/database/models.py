@@ -42,11 +42,15 @@ class AreasORM(Base):
     name = Column(String(25), nullable=False, unique=True)
     description = Column(Text, nullable=True)
     visible = Column(SmallInteger, server_default="1")
+    type = Column(Integer, ForeignKey('types.id', ondelete='CASCADE', onupdate='CASCADE'), server_default="1")
     date = Column(TIMESTAMP, nullable=False,
                   server_default=text("current_timestamp()" if not is_sqlite() else "current_timestamp"))
 
-    def __init__(self, name: str, description: str = None, visible: bool = False, date: str = None, id: int = None):
+    def __init__(
+            self, name: str, type: int = 1, description: str = None, visible: bool = False, date: str = None,
+            id: int = None):
         self.id = id
+        self.type = type
         self.name = name
         self.description = description
         self.visible = visible
@@ -60,6 +64,7 @@ class AreasORM(Base):
     def __dic__(self) -> dict:
         return {
             'id': self.id,
+            'type': self.type,
             'name': self.name,
             'description': self.description,
             'visible': self.visible,

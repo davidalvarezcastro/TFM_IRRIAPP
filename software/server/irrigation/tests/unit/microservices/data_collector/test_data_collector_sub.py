@@ -147,6 +147,7 @@ class SensorDataCollectorUnitTest(unittest.TestCase):
     @patch.object(ServiceControllers, 'get_by_id')
     def test_save_status_does_not_insert_different_area_area_controller_ok(self, mockC, mockA, mockS):
         self.area = 500
+        self.type = 1
         self.controller = 4
         self.description = "a"
         self.name = "a"
@@ -169,6 +170,7 @@ class SensorDataCollectorUnitTest(unittest.TestCase):
 
         self.areaC = Area(
             id=self.area,
+            type=self.type,
             description=self.description,
             name=self.name,
             visible=self.visible,
@@ -227,6 +229,7 @@ class SensorDataCollectorUnitTest(unittest.TestCase):
 
         self.areaC = Area(
             id=self.area,
+            type=self.type,
             description=self.description,
             name=self.name,
             visible=self.visible,

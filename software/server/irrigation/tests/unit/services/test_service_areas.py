@@ -22,6 +22,7 @@ class ServiceAreasUnitTest(unittest.TestCase):
 
     def setUp(self):
         self.id = 1
+        self.type = 1
         self.name = "name"
         self.description = "this is a dummy description"
         self.visible = True
@@ -30,6 +31,7 @@ class ServiceAreasUnitTest(unittest.TestCase):
 
         self.area = Area(
             id=self.id,
+            type=self.type,
             description=self.description,
             name=self.name,
             visible=self.visible,
