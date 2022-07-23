@@ -9,3 +9,9 @@ export type SensorData = {
     raining: boolean,
     date: string,
 }
+
+
+export type SensorDataSearch = {
+    start: string,
+    end: string,
+}

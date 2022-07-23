@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, reactive, defineEmits, PropType, computed } from "vue";
+import { defineEmits, PropType, computed } from "vue";
 import { Controller } from "../../../types/controllers";
 import swal from "sweetalert";
 

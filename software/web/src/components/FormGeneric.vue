@@ -1,13 +1,5 @@
 <script setup lang="ts">
-import {
-  ref,
-  Ref,
-  defineEmits,
-  PropType,
-  reactive,
-  computed,
-  watch,
-} from "vue";
+import { ref, defineEmits, PropType, reactive, computed, watch } from "vue";
 import { Area } from "../types/areas";
 import { AreaType } from "../types/area_types";
 import { Controller } from "../types/controllers";

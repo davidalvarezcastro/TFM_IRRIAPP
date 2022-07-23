@@ -1,4 +1,6 @@
 export { debug } from './logs';
+export { getStringFromDate } from './dates';
+export { getColor } from './chats';
 
 /**
  * It checks if any value is empty

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted, Ref, computed } from "vue";
+import { ref, onMounted, Ref, onBeforeUnmount } from "vue";
 import {
   getAreas,
   postArea,
@@ -22,6 +22,9 @@ import ListControllers from "./Lists/Controllers.vue";
 import FormGeneric from "../../components/FormGeneric.vue";
 import { debug } from "../../utils/index";
 import { notify } from "@kyvg/vue3-notification";
+import { useRouter } from "vue-router";
+
+const router = useRouter();
 
 let areas: Ref<Area[]> = ref([]);
 let timerAreas: ReturnType<typeof setInterval> | Ref<null> = ref(null);
@@ -48,6 +51,22 @@ onMounted(async () => {
 
   fetchControllers();
   timerControllers = setInterval(fetchControllers, TIMER_FETCH_CONTROLLERS);
+});
+
+onBeforeUnmount(async () => {
+  controllers.value = [];
+  delete controllers.value;
+  areas.value = [];
+  delete areas.value;
+  types.value = [];
+  delete types.value;
+
+  try {
+    clearInterval(timerControllers as number);
+  } catch (error) {}
+  try {
+    clearInterval(timerAreas as number);
+  } catch (error) {}
 });
 
 const handleError = (title, error) => {
@@ -112,6 +131,7 @@ const handleClickDetailController = (
 ) => {
   areaController.value = null;
   debug("handleClickDetailController", JSON.stringify(controller));
+  router.push(`/controller/${controller.id}`);
 };
 
 /**
@@ -327,10 +347,6 @@ let areaController: Ref<number | null> = ref(null);
 
 <style lang="scss" scoped>
 .home {
-  margin: 20px auto;
-  width: 90%;
-  padding: 15px;
-
   .headers {
     position: relative;
     .add-bottom {

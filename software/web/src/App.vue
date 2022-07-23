@@ -1,7 +1,7 @@
 <template>
   <v-app>
     <NavBar />
-    <v-main>
+    <v-main class="app">
       <router-view />
     </v-main>
 
@@ -20,3 +20,11 @@ export default defineComponent({
   },
 });
 </script>
+
+<style lang="scss" scoped>
+.app {
+  margin: 20px auto;
+  width: 90%;
+  padding: 15px;
+}
+</style>

@@ -10,10 +10,10 @@ interface ResponseSensorDataHistorical {
     status: string,
 }
 
-export const getHistorical = async (startDate: string, endDate: string): Promise<SensorData[]> => {
+export const getHistorical = async (controller: number, startDate: string, endDate: string): Promise<SensorData[]> => {
     const queryParameters = `?start_date=${startDate}&end_date=${endDate}`;
 
-    return axios.get<any, ResponseSensorDataHistorical>(`${API_SENSOR_DATA_HISTORICAL}${queryParameters}`).then((data) => {
+    return axios.get<any, ResponseSensorDataHistorical>(`${API_SENSOR_DATA_HISTORICAL.replace(':controller', controller.toString())}${queryParameters}`).then((data) => {
         if (data) {
             return data.data.sensor_data.map(i => {
                 return {

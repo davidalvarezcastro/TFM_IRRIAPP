@@ -1,12 +1,19 @@
 import { Controller } from '../../types/controllers';
 import { axios, ErrorResponse, Response } from '../axios';
-import { API_CONTROLLERS_DELETE, API_CONTROLLERS_GET_ALL, API_CONTROLLERS_POST, API_CONTROLLERS_PUT } from '../urls';
+import {
+    API_CONTROLLERS_GET_ALL,API_CONTROLLERS_GET_CONTROLLER,
+    API_CONTROLLERS_POST, API_CONTROLLERS_PUT, API_CONTROLLERS_DELETE,
+} from '../urls';
 
 
 interface ResponseGetControllers extends Response {
     data: {
         controllers: Record<string, string>[];
     };
+}
+
+interface ResponseGetController extends Response {
+    data: Record<string, string>;
 }
 
 interface ResponsePPDController extends Response {
@@ -33,6 +40,26 @@ export const getControllers = async (allVisibility: boolean = false): Promise<Co
                     date: i.date,
                 } as unknown as Controller
             });
+        }
+
+        return Promise.reject();
+    })
+}
+
+export const getController = async (controller: number, allVisibility: boolean = false): Promise<Controller> => {
+    const queryParameters = `?all_visibility=${allVisibility}`;
+
+    return axios.get<any, ResponseGetController>(`${API_CONTROLLERS_GET_CONTROLLER.replace(':controller', controller.toString())}${queryParameters}`).then((data) => {
+        if (data) {
+            return {
+                id: parseInt(data.data.id),
+                area: parseInt(data.data.area),
+                name: data.data.name,
+                description: data.data.description,
+                type: parseInt(data.data.id),
+                visible: data.data.visible,
+                date: data.data.date,
+            } as unknown as Controller
         }
 
         return Promise.reject();
