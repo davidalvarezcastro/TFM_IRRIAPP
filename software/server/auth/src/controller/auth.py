@@ -24,7 +24,7 @@ class Login(Resource):
         credentials = LoginSchema().load(request.json)
 
         try:
-            user = DAOUser.get_user_by_email(credentials['email'])
+            user = DAOUser.get_user_by_username(credentials['user'])
 
             if check_passwords(
                     user.password, credentials['password'], user.salt):

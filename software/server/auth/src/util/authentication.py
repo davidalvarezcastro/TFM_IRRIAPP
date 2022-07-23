@@ -15,7 +15,7 @@ class AccessToken:
 
     def __init__(self):
         self.__secret_token = os.getenv('SECRET_TOKEN', 'shhhh!!')
-        self.__exp_delta = int(os.getenv('TOKEN_EXP_DELTA', 60*60))
+        self.__exp_delta = int(os.getenv('TOKEN_EXP_DELTA', 60 * 60))
         self.__token_algorithm = os.getenv('TOKEN_ALGORITHM', 'HS256')
 
     def generate(self, payload):
@@ -33,7 +33,7 @@ class AccessToken:
 
         return jwt.encode(
             payload, self.__secret_token,
-            self.__token_algorithm).decode('utf-8')
+            self.__token_algorithm)
 
     def validate(self, token):
         """ Función para validar un token

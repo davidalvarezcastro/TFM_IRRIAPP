@@ -15,7 +15,7 @@ SQL_INSERT_ADMIN = "INSERT IGNORE INTO `{database}`.`usuarios` (`id_user`, `user
     ('1', 'admin', '{password}', 'admin@irrigation.gal', '1', '1', '{salt}');"
 # just for testing, comment when deploying
 SQL_INSERT_GUEST = "INSERT IGNORE INTO `{database}`.`usuarios` (`id_user`, `username`, `password`, `email`, `es_admin`, `activo`, `salt`) VALUES \
-    ('1', 'guest', '{password}', 'admin@irrigation.gal', '1', '1', '{salt}');"
+    ('2', 'guest', '{password}', 'guest@irrigation.gal', '0', '1', '{salt}');"
 
 
 def execute_query(query: str) -> None:

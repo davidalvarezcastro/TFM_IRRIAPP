@@ -38,7 +38,8 @@ class SettingsAPI:
 
 
 class SettingsDatabase:
-    HOST: str = "192.168.1.135"
+    # HOST: str = os.getenv('DB_HOST', 'localhost')
+    HOST: str = os.getenv('IRRIGATION_HOST', 'localhost')
     PORT: int = int(os.getenv('DB_PORT', 3306))
     USER: str = os.getenv('DB_USER', 'user')
     PASSWORD: str = os.getenv('DB_PASS', 'shhhh it is a secret!')

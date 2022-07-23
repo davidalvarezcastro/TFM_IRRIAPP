@@ -4,11 +4,11 @@ from flask_restx import fields as fields_rest
 
 class LoginSchema(Schema):
 
-    email = fields.Email(
+    user = fields.String(
         required=True,
-        data_key='email',
+        data_key='user',
         error_messages={
-            'invalid': 'Email must follow a correct email format!'
+            'invalid': 'User must be a string!'
         })
 
     password = fields.String(
@@ -21,6 +21,6 @@ class LoginSchema(Schema):
     @staticmethod
     def doc(api, method=None):
         return api.model(LoginSchema.__name__, {
-            'email': fields_rest.String,
+            'user': fields_rest.String,
             'password': fields_rest.String
         })
