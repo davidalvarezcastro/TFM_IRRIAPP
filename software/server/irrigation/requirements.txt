@@ -1,0 +1,18 @@
+pipreqs
+attr==0.3.1
+attrs==21.4.0
+Flask==2.1.2
+Flask_Cors==3.0.10
+marshmallow==3.16.0
+mysql_connector_repackaged==0.3.1
+paho_mqtt==1.6.1
+python-dotenv==0.20.0
+PyMySQL==1.0.2
+pymongo==4.1.1
+SQLAlchemy==1.4.39
+
+# Do not change those
+click
+pep8==1.7.1
+flake8==3.9.2
+autopep8==1.5.7

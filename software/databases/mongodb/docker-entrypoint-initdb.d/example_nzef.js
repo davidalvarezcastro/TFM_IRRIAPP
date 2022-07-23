@@ -1,5 +1,6 @@
 
-// Para iniciar la base de datos mongo creear un archivo llamado nzef.js en este directorio con user, password y db correspondiente al .env/variables de entorno
+// To initialize the mongo database you need to create a nzef.js file im this folder
+// setting up username, password and same database as the .env file
 
 // db.createUser({
 //     user: "user",

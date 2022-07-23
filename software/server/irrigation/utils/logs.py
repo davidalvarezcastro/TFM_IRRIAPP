@@ -1,10 +1,8 @@
 # -*- coding: utf-8 -*-
-"""Clase wrapper para la gestión de logs de la aplicación
-"""
 import logging
 from logging.handlers import RotatingFileHandler
 import os
-import irrigation.settings as settings
+import settings as settings
 
 LOG_FORMAT_STR = '[%(asctime)s] %(levelname)s - %(message)s'
 LOGFILE = f"/logs/irrigation_{settings.MODE}.log"
@@ -12,14 +10,14 @@ LOGFILE_SIZE = 5  # mb
 
 
 class Log(object):
-    """ Clase para la gestión de Logs
+    """ Logs app manager
     """
 
     def __init__(self, filename=LOGFILE, name=__name__, logger=None):
-        """Inicializamos la configuración del Logs
+        """Init logs config
 
         Args:
-            filename(str): ruta del archivo de logs resultante
+            filename(str): path
             logger(logging.logger): logger
         """
         if logger is None:
