@@ -7,6 +7,9 @@ const router = useRouter();
 
 const breadcrumb = reactive([]);
 
+// @ts-ignore
+const BASE_URL = import.meta.env.BASE_URL;
+
 watch(
   router.currentRoute,
   (newValue, oldValue) => {
@@ -17,7 +20,7 @@ watch(
       breadcrumb.push({
         text: "Home",
         disabled: false,
-        href: route.fullPath,
+        href: BASE_URL,
       });
     } else {
       route.fullPath.split("/").forEach((r) => {
@@ -25,7 +28,7 @@ watch(
           text: r === "" ? "Home" : r,
           disabled: false,
           // @ts-ignore
-          href: r === "" ? "/" : route.href,
+          href: r === "" ? BASE_URL : route.href,
         });
       });
     }

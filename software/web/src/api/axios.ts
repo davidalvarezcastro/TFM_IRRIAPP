@@ -20,7 +20,6 @@ axios.interceptors.response.use((response: ServerResponse) => {
 });
 
 axios2.interceptors.response.use((response: ServerResponse) => {
-  console.log("asdjklasjdjashd", response)
   return response.data;
 });
 

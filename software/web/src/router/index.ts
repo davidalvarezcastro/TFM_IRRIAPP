@@ -51,15 +51,15 @@ router.beforeEach(async (to: RouteLocationNormalized, from: RouteLocationNormali
         if (['login', 'logout'].includes(to.name.toString())) return next();
     }
 
-  if(to.matched.some(record => record.meta.requiresAuth)) {
-    if (store.getters[`${MODULE_AUTH}/${GETTER_AUTH_VALID_SESSION}`]) {
-      next()
-      return
+    if(to.matched.some(record => record.meta.requiresAuth)) {
+        if (store.getters[`${MODULE_AUTH}/${GETTER_AUTH_VALID_SESSION}`]) {
+            next()
+            return
+        }
+        next('/login')
+    } else {
+        next();
     }
-    next('/login') 
-  } else {
-    next();
-  }
 });
 
 export default router;
