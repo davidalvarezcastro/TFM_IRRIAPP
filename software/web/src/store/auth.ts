@@ -1,76 +1,155 @@
+import CryptoJS from 'crypto-js';
+import jwt_decode from 'jwt-decode';
 import {
-    ACTION_FETCH_STATIONS_DATA,
-    ACTION_UPDATE_STATION_DATA,
-    MUTATION_UPDATE_STATION_DATA,
-} from "../../variables";
-import { Station } from "../../../types/stations";
-import { getStations } from "../../../api/getStations";
+    ACTION_LOGIN,
+    ACTION_LOGOUT,
+    GETTER_AUTH_TOKEN,
+    GETTER_AUTH_TOKEN_ADMIN,
+    GETTER_AUTH_TOKEN_INFO,
+    GETTER_AUTH_TOKEN_USER,
+    GETTER_AUTH_VALID_SESSION,
+    MUTATION_SET_AUTH_ERROR,
+    MUTATION_SET_AUTH_REQUEST,
+    MUTATION_SET_AUTH_SUCCESS,
+    MUTATION_SET_LOGOUT,
+} from "./variables";
+import { Session, User } from "../types/auth";
+import { ACCESS_TOKEN, clearSession, EXPIRES_AT, getInfoSession, ID_TOKEN, setSession } from "../services/auth/session";
+import { postLogin } from '../api/services/auth';
 
-export interface StationsState {
-    stations: Record<string, Station>;
+export interface AuthState {
+    status: string,
+    idToken: string,
+    token: string,
+    expiration: string,
+    user: User | null
 }
 
 const initialState = {
-    stations: {},
-} as StationsState;
+    status: '',
+    idToken: getInfoSession(ID_TOKEN),
+    token: getInfoSession(ACCESS_TOKEN),
+    expiration: getInfoSession(EXPIRES_AT),
+    user: null
+} as AuthState;
 
 const auth = {
     namespaced: true,
     state: initialState,
 
     getters: {
-        stations: (state: StationsState): unknown => {
-            return state.stations;
+        [GETTER_AUTH_TOKEN]: (state: AuthState): string => state.token,
+        [GETTER_AUTH_VALID_SESSION]: (state: AuthState): boolean => {
+            try {
+                if (state.idToken !== '' && state.token !== '' && state.expiration !== '' && new Date().getTime() < JSON.parse(state.expiration)) {
+                    return true
+                } else {
+                    return false;
+                }
+            } catch (err) {
+                if (import.meta.env.NODE_ENV !== 'production') console.log(err)
+                return false
+            }
+        },
+        [GETTER_AUTH_TOKEN_INFO]: (state: AuthState): Record<string, string> => {
+            try {
+                return jwt_decode(state.token) as Record<string, string>;
+            } catch (error) {
+                return {};
+            }
+        },
+        [GETTER_AUTH_TOKEN_USER]: (state: AuthState, getters: Record<string, Record<string, string>>): string => {
+            try {
+                return getters[GETTER_AUTH_TOKEN_INFO].username
+            } catch (error) {
+                return '';
+            }
+        },
+        [GETTER_AUTH_TOKEN_ADMIN]: (state: AuthState, getters: Record<string, Record<string, boolean>>): boolean => {
+            try {
+                console.log(getters[GETTER_AUTH_TOKEN_INFO])
+                return getters[GETTER_AUTH_TOKEN_INFO].admin
+            } catch (error) {
+                return false;
+            }
         },
     },
 
     mutations: {
-        [MUTATION_UPDATE_STATION_DATA](state: StationsState, data: Station): void {
-            state.stations[data.id] = data;
+        [MUTATION_SET_AUTH_REQUEST]: (state: AuthState) => {
+            state.status = 'loading'
         },
+
+        [MUTATION_SET_AUTH_SUCCESS]: (state: AuthState, {
+            idToken,
+            accessToken,
+            expiresAt,
+            user
+        }: Session) => {
+            state.idToken = idToken
+            state.token = accessToken
+            state.expiration = expiresAt
+            state.user = user as User
+        },
+
+        [MUTATION_SET_AUTH_ERROR]: (state: AuthState) => {
+            state.status = 'error';
+        },
+
+        [MUTATION_SET_LOGOUT]: (state: AuthState) => {
+            state.status = '';
+            state.idToken = '';
+            state.token = '';
+            state.expiration = '';
+        }
     },
 
     actions: {
         /**
-         * Function to check if station not exists and updates station info
+         * Handle login action in the app
          */
-        async [ACTION_UPDATE_STATION_DATA](
-            {
-                commit,
-                state,
-            }: {
-                commit: <T extends unknown[]>(...args: T) => void;
-                state: StationsState;
-            },
-            station: Station
-        ): Promise<void> {
-            if (station.id != 0 && station.id !== undefined) {
-                if (
-                    !Object.keys(state.stations).includes((station.id.toString()).toString()) ||
-                    !(JSON.stringify(state.stations[station.id.toString()]) !== JSON.stringify(station))
-                ) {
-                    commit(MUTATION_UPDATE_STATION_DATA, station);
-                }
+        [ACTION_LOGIN]: async ({ commit }: {
+            commit: <T extends unknown[]>(...args: T) => void;
+        }, user: User) => {
+            try {
+                let jwtToken = await postLogin(user)
+                const idToken = CryptoJS.AES.encrypt(user.user, "irriapp") + '_' + (new Date()).toISOString().slice(0, 10).replace(/-/g, "");
+
+                let token = jwt_decode(jwtToken) as Record<string, string>
+                // if (!token.admin) {
+                //     throw "Not admin user! Forbidden access!";
+                // }
+
+                let sesion = {
+                    idToken: idToken,
+                    accessToken: jwtToken,
+                    expiresAt: token.exp,
+                } as Session
+
+                setSession(sesion)
+                sesion.user = user;
+                commit(MUTATION_SET_AUTH_SUCCESS, sesion)
+                if (import.meta.env.NODE_ENV !== 'production') console.log("Login: ok!")
+            } catch (error) {
+                commit(MUTATION_SET_AUTH_ERROR)
+                clearSession();
+                if (import.meta.env.NODE_ENV !== 'production') console.log(`Bad credentials!`, error)
+                // @ts-ignore
+                throw error.response.data.message;
             }
         },
 
         /**
-         * Function to get all stations
+         * Handle logout action in the app
          */
-        async [ACTION_FETCH_STATIONS_DATA]({
-            commit,
-            dispatch,
-            state,
+        [ACTION_LOGOUT]: ({
+            commit
         }: {
             commit: <T extends unknown[]>(...args: T) => void;
-            dispatch: <T extends unknown[]>(...args: T) => void;
-            state: StationsState;
-        }): Promise<void> {
-            const stations = await getStations()
-
-            stations.forEach(station => {
-                dispatch(ACTION_UPDATE_STATION_DATA, station);
-            });
+        }) => {
+            clearSession()
+            commit(MUTATION_SET_LOGOUT)
+            if (import.meta.env.NODE_ENV !== 'production') console.log(`Logout: ok!`)
         },
     },
 };

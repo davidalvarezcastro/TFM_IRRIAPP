@@ -2,8 +2,16 @@
 import { defineEmits, PropType, computed } from "vue";
 import { Controller } from "../../../types/controllers";
 import swal from "sweetalert";
+import { useStore } from "vuex";
+import {
+  GETTER_AUTH_TOKEN_ADMIN,
+  GETTER_AUTH_VALID_SESSION,
+  MODULE_AUTH,
+} from "../../../store/variables";
 
 name: "ListControllers";
+
+const store = useStore();
 
 /**
  * Component's attribrutes
@@ -37,6 +45,11 @@ const emitDeleteController = function (controller: Controller, cb: () => void) {
 const emitDetailController = function (controller: Controller, cb: () => void) {
   emit("detailController", controller, cb);
 };
+
+/**
+ * Auth
+ */
+const isAdmin = store.getters[`${MODULE_AUTH}/${GETTER_AUTH_TOKEN_ADMIN}`];
 
 /**
  * controllers
@@ -105,8 +118,9 @@ const getHeader = computed(() => {
               </v-icon>
             </span>
           </td>
-          <td class="text-center operations">
+          <td class="operations">
             <v-btn
+              v-if="isAdmin"
               color="warning"
               icon="mdi-pencil-outline"
               @click="handleClickEdit(controller)"
@@ -120,6 +134,7 @@ const getHeader = computed(() => {
             />
 
             <v-btn
+              v-if="isAdmin"
               color="error"
               icon="mdi-delete-outline"
               @click="handleClickDelete(controller)"

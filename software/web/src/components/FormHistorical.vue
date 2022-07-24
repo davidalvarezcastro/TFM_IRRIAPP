@@ -79,7 +79,6 @@ const reset = () => {
 watch(
   () => props.start,
   (newValue, oldValue) => {
-    console.log("watcher start", props.start);
     form.startDate = props.start;
   },
   { immediate: true }

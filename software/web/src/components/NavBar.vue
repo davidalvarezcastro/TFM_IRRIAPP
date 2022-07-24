@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import { reactive, watch } from "vue";
+import { reactive, ref, watch } from "vue";
 import { useRouter } from "vue-router";
+import { logout } from "../services/auth";
 
 const router = useRouter();
 
@@ -35,6 +36,10 @@ watch(
 const goHome = () => {
   router.push("/");
 };
+
+const handleLogout = () => {
+  logout();
+};
 </script>
 
 <template>
@@ -45,6 +50,15 @@ const goHome = () => {
     <v-breadcrumbs class="breadcrumbs" :items="breadcrumb" divider="/" />
 
     <v-spacer> </v-spacer>
+
+    <div class="settings">
+      <v-btn
+        class="acc-icon"
+        flat
+        icon="mdi-account-arrow-left-outline"
+        @click="handleLogout"
+      />
+    </div>
   </v-app-bar>
 </template>
 
@@ -54,5 +68,10 @@ const goHome = () => {
   left: 150px;
   color: lightgrey;
   font-size: 0.9em;
+}
+
+.acc-icon {
+  color: white;
+  font-size: 1.5em;
 }
 </style>

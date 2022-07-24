@@ -1,7 +1,7 @@
 <template>
   <v-app>
-    <NavBar />
-    <v-main class="app">
+    <NavBar v-if="validSession" />
+    <v-main :class="{ app: validSession }">
       <router-view />
     </v-main>
 
@@ -9,16 +9,17 @@
   </v-app>
 </template>
 
-<script lang="ts">
+<script setup lang="ts">
 import { defineComponent } from "vue";
+import { useStore } from "vuex";
 import NavBar from "./components/NavBar.vue";
+import { GETTER_AUTH_VALID_SESSION, MODULE_AUTH } from "./store/variables";
 
-export default defineComponent({
-  name: "App",
-  components: {
-    NavBar,
-  },
-});
+name: "App";
+const store = useStore();
+
+const validSession =
+  store.getters[`${MODULE_AUTH}/${GETTER_AUTH_VALID_SESSION}`];
 </script>
 
 <style lang="scss" scoped>
