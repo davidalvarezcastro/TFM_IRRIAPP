@@ -3,6 +3,11 @@ import jwt_decode from 'jwt-decode';
 import {
     ACTION_LOGIN,
     ACTION_LOGOUT,
+    GETTER_AUTH_TOKEN,
+    GETTER_AUTH_TOKEN_ADMIN,
+    GETTER_AUTH_TOKEN_INFO,
+    GETTER_AUTH_TOKEN_USER,
+    GETTER_AUTH_VALID_SESSION,
     MUTATION_SET_AUTH_ERROR,
     MUTATION_SET_AUTH_REQUEST,
     MUTATION_SET_AUTH_SUCCESS,
@@ -33,9 +38,8 @@ const auth = {
     state: initialState,
 
     getters: {
-        isLoggedIn: (state: AuthState): boolean => !!state.token,
-        token: (state: AuthState): string => state.token,
-        isValidSession: (state: AuthState): boolean => {
+        [GETTER_AUTH_TOKEN]: (state: AuthState): string => state.token,
+        [GETTER_AUTH_VALID_SESSION]: (state: AuthState): boolean => {
             try {
                 if (state.idToken !== '' && state.token !== '' && state.expiration !== '' && new Date().getTime() < JSON.parse(state.expiration)) {
                     return true
@@ -47,28 +51,28 @@ const auth = {
                 return false
             }
         },
-        tokenInfo: (state: AuthState): Record<string, string> => {
+        [GETTER_AUTH_TOKEN_INFO]: (state: AuthState): Record<string, string> => {
             try {
                 return jwt_decode(state.token) as Record<string, string>;
             } catch (error) {
                 return {};
             }
         },
-        userToken: (state: AuthState, getters: Record<string, Record<string, string>>): string => {
+        [GETTER_AUTH_TOKEN_USER]: (state: AuthState, getters: Record<string, Record<string, string>>): string => {
             try {
-                return getters.tokenInfo.user as string
+                return getters[GETTER_AUTH_TOKEN_INFO].username
             } catch (error) {
                 return '';
             }
         },
-        isAdmin: (state: AuthState, getters: Record<string, unknown>): boolean => {
+        [GETTER_AUTH_TOKEN_ADMIN]: (state: AuthState, getters: Record<string, Record<string, boolean>>): boolean => {
             try {
-                return getters.isAdmin as boolean
+                console.log(getters[GETTER_AUTH_TOKEN_INFO])
+                return getters[GETTER_AUTH_TOKEN_INFO].admin
             } catch (error) {
                 return false;
             }
         },
-        authStatus: (state: AuthState): string => state.status,
     },
 
     mutations: {

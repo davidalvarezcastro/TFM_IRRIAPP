@@ -23,10 +23,13 @@ import FormGeneric from "../../components/FormGeneric.vue";
 import { debug } from "../../utils/index";
 import { notify } from "@kyvg/vue3-notification";
 import { useRouter } from "vue-router";
+import { useStore } from "vuex";
+import { GETTER_AUTH_TOKEN_ADMIN, MODULE_AUTH } from "../../store/variables";
 
 name: "HomeView";
 
 const router = useRouter();
+const store = useStore();
 
 let areas: Ref<Area[]> = ref([]);
 let timerAreas: ReturnType<typeof setInterval> | Ref<null> = ref(null);
@@ -78,6 +81,11 @@ const handleError = (title, error) => {
     type: "error",
   });
 };
+
+/**
+ * Auth
+ */
+const isAdmin = store.getters[`${MODULE_AUTH}/${GETTER_AUTH_TOKEN_ADMIN}`];
 
 /**
  * Table Controllers
@@ -289,6 +297,7 @@ let areaController: Ref<number | null> = ref(null);
     <div class="headers">
       <h1>Control Panel</h1>
       <v-btn
+        v-if="isAdmin"
         class="add-bottom"
         color="success"
         prepend-icon="mdi-plus"

@@ -4,7 +4,7 @@ import LoginView from "../views/login/index.vue";
 import DetailControllerView from "../views/controllers/detail.vue";
 
 import store from '../store';
-import { MODULE_AUTH } from "../store/variables";
+import { GETTER_AUTH_VALID_SESSION, MODULE_AUTH } from "../store/variables";
 import { tryToLogIn } from "../services/auth";
 
 const routes = [
@@ -52,7 +52,7 @@ router.beforeEach(async (to: RouteLocationNormalized, from: RouteLocationNormali
     }
 
   if(to.matched.some(record => record.meta.requiresAuth)) {
-    if (store.getters[`${MODULE_AUTH}/isValidSession`]) {
+    if (store.getters[`${MODULE_AUTH}/${GETTER_AUTH_VALID_SESSION}`]) {
       next()
       return
     }

@@ -2,8 +2,12 @@
 import { ref, computed, PropType } from "vue";
 import { Area } from "../types/areas";
 import { AREA_TYPE_INFO } from "../utils/area_types";
+import { useStore } from "vuex";
+import { GETTER_AUTH_TOKEN_ADMIN, MODULE_AUTH } from "../store/variables";
 
 name: "CardArea";
+
+const store = useStore();
 
 /**
  * Component's attribrutes
@@ -41,6 +45,11 @@ const emitEditArea = function (area: Area, cb: () => void) {
 const emitDeleteArea = function (area: Area, cb: () => void) {
   emit("deleteArea", area, cb);
 };
+
+/**
+ * Auth
+ */
+const isAdmin = store.getters[`${MODULE_AUTH}/${GETTER_AUTH_TOKEN_ADMIN}`];
 
 /**
  * Management
@@ -103,7 +112,7 @@ const handleClickDelete = () => {
           {{ area.description }}
         </div>
 
-        <div class="operations">
+        <div class="operations" v-if="isAdmin">
           <v-btn
             color="success"
             icon="mdi-plus"

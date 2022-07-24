@@ -13,12 +13,13 @@
 import { defineComponent } from "vue";
 import { useStore } from "vuex";
 import NavBar from "./components/NavBar.vue";
-import { MODULE_AUTH } from "./store/variables";
+import { GETTER_AUTH_VALID_SESSION, MODULE_AUTH } from "./store/variables";
 
 name: "App";
 const store = useStore();
 
-const validSession = store.getters[MODULE_AUTH + "/isValidSession"];
+const validSession =
+  store.getters[`${MODULE_AUTH}/${GETTER_AUTH_VALID_SESSION}`];
 </script>
 
 <style lang="scss" scoped>
