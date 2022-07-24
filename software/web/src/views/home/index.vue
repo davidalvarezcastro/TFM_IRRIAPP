@@ -24,6 +24,8 @@ import { debug } from "../../utils/index";
 import { notify } from "@kyvg/vue3-notification";
 import { useRouter } from "vue-router";
 
+name: "HomeView";
+
 const router = useRouter();
 
 let areas: Ref<Area[]> = ref([]);

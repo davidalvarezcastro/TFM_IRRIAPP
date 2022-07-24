@@ -21,7 +21,7 @@ import {
 import HistoricalGraph from "../../components/HistoricalGraph.vue";
 import FormHistorical from "../../components/FormHistorical.vue";
 
-name: "DetailController";
+name: "DetailControllerView";
 
 const route = useRoute();
 const router = useRouter();
