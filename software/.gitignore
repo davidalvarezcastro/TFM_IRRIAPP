@@ -125,3 +125,7 @@ ENV/
 **/migrations/versions/*_.py
 
 **/irrigation/main.py
+
+
+# allow microcontroller libs
+!**/relay/lib
