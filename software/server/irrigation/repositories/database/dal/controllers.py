@@ -95,6 +95,31 @@ class ControllersDAL(InterfaceControllersDAL):
             return None
 
     @staticmethod
+    def get_by_area(area: int, all_visibility: bool = False) -> typing.List[Controller]:
+        result = []
+        query = {
+            'area': area
+        }
+
+        try:
+            if not all_visibility:
+                query['visible'] = True
+
+            with session_scope() as session:
+                resultDB = session.query(ControllersORM).filter_by(**query).all()
+
+                for el in resultDB:
+                    result.append(
+                        ControllersDAL.init_from_orm_to_model(result=el)
+                    )
+
+                return ControllersDAL.init_from_orm_to_model(result=result)
+        except Exception:
+            pass
+
+        return result
+
+    @staticmethod
     def get_all(all_visibility: bool = False) -> typing.List[Controller]:
         result = []
         query = {}  # all data
