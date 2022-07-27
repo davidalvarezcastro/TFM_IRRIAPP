@@ -72,6 +72,17 @@ class ServiceSensorHistoricUnitTest(unittest.TestCase):
         self.assertTrue("error" in str(context.exception))
         mock.assert_called_once()
 
+    @patch.object(SensorDataDAL, 'get_last')
+    @mongomock.patch(servers=((db_mongo_settings.HOST, db_mongo_settings.PORT),))
+    def test_sensor_data_historic_get_last_call_dal_get_last_ok(self, mock):
+        self.controller.get_last(
+            query=self.query_sensor_data
+        )
+
+        mock.assert_called_once_with(
+            query=self.query_sensor_data
+        )
+
     @patch.object(SensorDataDAL, 'get')
     @mongomock.patch(servers=((db_mongo_settings.HOST, db_mongo_settings.PORT),))
     def test_sensor_data_historic_get_call_dal_get_ok(self, mock):
