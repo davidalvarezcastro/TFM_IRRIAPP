@@ -7,14 +7,14 @@ from domain.models.actuator import QueryActuatorData
 from domain.models.irrigation_data import IrrigationData
 
 
-class InterfaceSensorsHistoricDAL(ABC):
+class InterfaceIrrigationHistoricDAL(ABC):
 
     @abstractmethod
     def insert(data: IrrigationData) -> typing.Tuple[str, ExceptionDatabase]:
         raise NotImplementedError
 
     @abstractmethod
-    def update(data: IrrigationData) -> ExceptionDatabase:
+    def end_irrigation(area: int) -> ExceptionDatabase:
         raise NotImplementedError
 
     @abstractmethod
