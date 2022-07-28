@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 """
-    microservice sensor data recollector
+    microservice sensor data processor (actuator activation check)
+    TODO:
 """
 import json
 import os

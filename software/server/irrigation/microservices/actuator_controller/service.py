@@ -1,7 +1,6 @@
 """
-    Service for getting message with the sensors status from the controllers
-        - data getter thread
-        - processing data thread
+    Service for processing sensor data (historical) to resolve if it is necessary
+    to activate or not the pertinent actuator (in this prototype, irrigation relay)
 """
 import queue
 import uuid
@@ -10,8 +9,9 @@ import uuid
 from settings import messages_settings
 from domain.messages.wrapper import MessagesClientWrapper
 from domain.messages.services import MessagesServices
-from domain.observer.controller_observer import ControllerEventsObserver
-from microservices.data_collector.data_collector import SensorDataCollector
+from domain.observer.actuator_observer import ActuatorEventsObserver
+from microservices.actuator_controller.data_processor import SensorDataProcessor
+from application.actuator.models.simple_actuator_irrigation import SimpleActuatorIrirgationHandler
 
 
 class MicroserviceHandleActuator():
@@ -37,17 +37,21 @@ class MicroserviceHandleActuator():
         )
 
         # messages observer
-        self.messages_manager = ControllerEventsObserver(
+        self.messages_manager = ActuatorEventsObserver(
             queue=self.exceptions_queue,
             messages_service=self.message_service
         )
         self.messages_manager.init_subs()
 
-        # initialize data collectot
-        self.data_collector = SensorDataCollector(
-            observer=self.messages_manager
+        self.actuator_activation_strategy = SimpleActuatorIrirgationHandler()
+
+        # initialize data processing
+        self.data_processor = SensorDataProcessor(
+            observer=self.messages_manager,
+            pusblisher=self.message_service,
+            actuator_strategy=self.actuator_activation_strategy
         )
 
     def run(self):
         self._initialize_modules()
-        self.data_collector.run()
+        self.data_processor.run()
