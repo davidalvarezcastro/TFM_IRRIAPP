@@ -88,9 +88,8 @@ const createChart = (
           type: "time",
           offset: true,
           time: {
-            unit: "minute",
             displayFormats: {
-              hour: "HH:mm:ss",
+              hour: "YYYY-MM-DD HH:mm:ss",
             },
           },
           title: {
@@ -127,16 +126,21 @@ const handleDraw = (data: SensorData[], redraw: boolean = false): void => {
     const dataInfoRaining = [];
 
     data.forEach((sensor) => {
+      const date = new Date(sensor.date)
+        .toISOString()
+        .split(".")[0]
+        .replace("T", " ");
+
       dataInfoTemperature.push({
-        x: sensor.date,
+        x: date,
         y: sensor.temperature,
       });
       dataInfoHumidity.push({
-        x: sensor.date,
+        x: date,
         y: sensor.humidity,
       });
       dataInfoRaining.push({
-        x: sensor.date,
+        x: date,
         y: sensor.raining ? 100 : 0,
       });
     });
