@@ -14,6 +14,7 @@ from domain.observer.topics import ACTUATOR_RELAY_ON_OK, ACTUATOR_RELAY_OFF_OK
 from domain.messages.services import MessagesServices
 from domain.models.controllers import Controller
 from application.services.areas import ServiceAreas
+from domain.models.irrigation_data import IrrigationData
 from application.services.controllers import ServiceControllers
 from application.services.sensor_data import ServiceSensorsHistoric
 from domain.models.sensor_data_historic import QuerySensorData, SensorData
@@ -92,57 +93,73 @@ class SensorDataProcessor(Sub):
 
     def _get_summary_sensor_data_area(self, area: Area) -> IrrigationActivateActuator:
         last_sensor_data = []
+        result = None
 
-        # get all controllers from area
-        controllers = self.service_controllers.get_by_area(
-            area=area.id,
-            all_visibility=True
-        )
+        try:
+            # get all controllers from area
+            controllers = self.service_controllers.get_by_area(
+                area=area.id,
+                all_visibility=True
+            )
 
-        # last value stored (from all controllers)
-        for controller in controllers:
+            if len(controllers) <= 0:
+                return None
 
-            # last value controller
-            result = self.service_sensor_data.get_last(
+            # last value stored (from all controllers)
+            for controller in controllers:
+
+                # last value controller
+                result = self.service_sensor_data.get_last(
+                    query=QuerySensorData(
+                        area_id=area.id,
+                        controller_id=controller.id,
+                    )
+                )
+
+                if result is not None:
+                    last_sensor_data.append(result)
+
+            # get data from last 24 hours (one controller is enough to check it)
+            end_last_value = get_now()
+            start_last_value = get_now() - datetime.timedelta(hours=24)
+
+            result = self.service_sensor_data.get(
                 query=QuerySensorData(
                     area_id=area.id,
-                    controller_id=controller.id,
+                    controller_id=controllers[0].id,
+                    start_date=start_last_value,
+                    end_date=end_last_value,
                 )
             )
 
-            if result is not None:
-                last_sensor_data.append(result)
+            # average values
+            number_controllers = len(last_sensor_data)
+            if number_controllers > 0:
+                average_temperature = (
+                    sum(list(map(lambda data: data.temperature, last_sensor_data)))) / number_controllers
+                average_humidity = (
+                    sum(list(map(lambda data: data.temperature, last_sensor_data)))) / number_controllers
+            else:
+                average_temperature = 0
+                average_humidity = 0
 
-        # get data from last 24 hours (one controller is enough to check it)
-        end_last_value = datetime.datetime.now()
-        start_last_value = datetime.datetime.now() - datetime.timedelta(hours=24)
+            # % of the last 24 hours it was raining
+            entries_rainning_last_24_hours = len(result)
+            if entries_rainning_last_24_hours > 0:
+                average_rainning_last_24_hours = (
+                    sum(list(map(lambda data: data.raining, result)))) / entries_rainning_last_24_hours * 100
+            else:
+                average_rainning_last_24_hours = 0
 
-        result = self.service_sensor_data.get(
-            query=QuerySensorData(
-                area_id=area.id,
-                controller_id=controllers[0].id,
-                start_date=start_last_value,
-                end_date=end_last_value,
+            result = IrrigationActivateActuator(
+                rainning=round(average_rainning_last_24_hours, 2),
+                humidity=average_humidity,
+                temperature=average_temperature,
             )
-        )
+        except Exception as error:
+            logger_error('_get_summary_sensor_data_area', error)
 
-        # average values
-        number_controllers = len(last_sensor_data)
-        average_temperature = (
-            sum(list(map(lambda data: data.temperature, last_sensor_data)))) / number_controllers
-        average_humidity = (
-            sum(list(map(lambda data: data.temperature, last_sensor_data)))) / number_controllers
-
-        # % of the last 24 hours it was raining
-        entries_rainning_last_24_hours = len(result)
-        average_rainning_last_24_hours = (
-            sum(list(map(lambda data: data.raining, result)))) / entries_rainning_last_24_hours * 100
-
-        return IrrigationActivateActuator(
-            rainning=round(average_rainning_last_24_hours, 2),
-            humidity=average_humidity,
-            temperature=average_temperature,
-        )
+        return result
 
     def _wait_for_confirmation_from_actuator(self, area: int, mode_on: bool):
         max_retries = 3
@@ -162,6 +179,56 @@ class SensorDataProcessor(Sub):
 
             time.sleep(0.5)
         return result
+
+    def _handle_activate_actuator(self, area: Area) -> bool:
+        # communicate with actuator by using mqtt
+        self.pusblisher.pub_relay_on(
+            area=area.id,
+            payload={}
+        )
+
+        actuator_on = self._wait_for_confirmation_from_actuator(
+            area=area,
+            mode_on=True
+        )
+
+        _LOGGER.debug(f"\t\t activate actuator? {actuator_on} ")
+
+        # insert data mongo
+        if actuator_on:
+            _LOGGER.debug(f"\t\t inserting new entry into irrigation database for area {area.id} ")
+            self.service_irrigation.insert(
+                data=IrrigationData(
+                    area_id=area.id,
+                    area=area.name,
+                    irrigation=actuator_on,
+                    start_date=get_now(),
+                    end_date=''  # mark as watering
+                )
+            )
+
+        return actuator_on
+
+    def _handle_desactivate_actuator(self, area: Area) -> bool:
+        self.pusblisher.pub_relay_off(
+            area=area.id,
+            payload={}
+        )
+        actuator_off = self._wait_for_confirmation_from_actuator(
+            area=area,
+            mode_on=False
+        )
+
+        _LOGGER.debug(f"\t\t desactivate actuator? {actuator_off} ")
+
+        # update data mongo
+        if actuator_off:
+            _LOGGER.debug(f"\t\t end irrigation for area {area.id} ")
+            self.service_irrigation.end_irrigation(
+                area=area.id
+            )
+
+        return actuator_off
 
     def _control_actuator_sensor_data(self) -> None:
         try:
@@ -189,31 +256,15 @@ class SensorDataProcessor(Sub):
                     _LOGGER.debug(
                         f"\nbase conditions: {data_check_activate_actuator}\n\t activate? {activate_actuator}")
 
-                    # communicate with actuator by using mqtt
                     if activate_actuator and not self.actuator_on:
-                        self.pusblisher.pub_relay_on(
-                            area=area.id,
-                            payload={}
+                        self.actuator_on = self._handle_activate_actuator(
+                            area=area
                         )
-
-                        self.actuator_on = self._wait_for_confirmation_from_actuator(
-                            area=area.id,
-                            mode_on=True
-                        )
-
-                        # insert data mongo
 
                     if not activate_actuator and self.actuator_on:
-                        self.pusblisher.pub_relay_off(
-                            area=area.id,
-                            payload={}
+                        self.actuator_on = not self._handle_desactivate_actuator(
+                            area=area
                         )
-                        self.actuator_on = not self._wait_for_confirmation_from_actuator(
-                            area=area.id,
-                            mode_on=False
-                        )
-
-                        # insert data mongo
 
                 time.sleep(DATA_PROCESSING_ACTUATOR_TIMER)
         except Exception as error:

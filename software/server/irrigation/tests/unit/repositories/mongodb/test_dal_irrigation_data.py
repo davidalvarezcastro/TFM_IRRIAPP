@@ -75,6 +75,7 @@ class DALIrrigationDataUnitTest(unittest.TestCase):
             'area': "area-1",
             'irrigation': 1,
             'start_date': datetime.datetime(2022, 7, 5, 21, 00, 00, 0),
+            'end_date': ''
         }
         result = self.manager.connection['col'].insert_one(data)
 

@@ -5,7 +5,7 @@ from application.actuator.models.interface_actuator_irrigation import InterfaceA
 
 class SimpleActuatorIrirgationHandler(InterfaceActuatorIrirgationHandler):
     """
-        Algorithm to resolve if it is necessary to activate the actuator (very simple)
+        Algorithm to resolve if it is necessary to activate the actuator (very simple and inefficient)
     """
 
     def check_activate_irrigation(self, query: IrrigationActivateActuator) -> bool:

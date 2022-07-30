@@ -36,9 +36,14 @@ class IrrigationDataDAL(InterfaceIrrigationHistoricDAL):
     def end_irrigation(self, area: int) -> typing.Tuple[str, ExceptionDatabase]:
         try:
             db = self.mongo.connection['col']
-            query = {"area_id": {
-                "$eq": area
-            }}
+            query = {
+                "area_id": {
+                    "$eq": area
+                },
+                "end_date": {
+                    "$eq": ''
+                }
+            }
             update = {"$set": {"end_date": datetime.datetime.now()}}
             result = db.update_one(query, update)
             return area

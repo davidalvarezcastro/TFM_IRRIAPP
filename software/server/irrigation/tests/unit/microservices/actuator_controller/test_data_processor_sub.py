@@ -3,262 +3,533 @@
     microservice sensor data processor (actuator activation check)
     TODO:
 """
+import datetime
 import json
 import os
 import queue
+from this import d
 import time
 import unittest
 import uuid
-from paho.mqtt.client import MQTTMessage
 
-from unittest.mock import MagicMock, Mock, patch
+from unittest.mock import MagicMock, Mock, PropertyMock, patch
 
-from settings import messages_settings
 from patterns.pubsub import PubSubEvent
 from domain.models.areas import Area
-from domain.observer.topics import CONTROLLER_STATUS
-from domain.messages.topics import TOPIC_AREA_SENSORS_STATUS_CONTROLLER
+from domain.observer.topics import ACTUATOR_RELAY_ON_OK, ACTUATOR_RELAY_OFF_OK
+from domain.messages.topics import TOPIC_AREA_ACTUATOR_RELAY_OFF_CONFIRMATION, TOPIC_AREA_ACTUATOR_RELAY_ON_CONFIRMATION
+from domain.messages.services import MessagesServices
 from domain.models.controllers import Controller
 from application.services.areas import ServiceAreas
 from application.services.controllers import ServiceControllers
 from application.services.sensor_data import ServiceSensorsHistoric
-from microservices.data_collector.queue_status import QueueState
-from microservices.data_collector.data_collector import SensorDataCollector
+from domain.models.sensor_data_historic import SensorData
+from application.services.irrigation_data import ServiceIrrigationHistoric
+from domain.models.irrigation_actuator_algorithm import IrrigationActivateActuator
+from microservices.actuator_controller.queue_status import QueueState
+from microservices.actuator_controller.data_processor import SensorDataProcessor
+from application.actuator.models.simple_actuator_irrigation import SimpleActuatorIrirgationHandler
 
 
 os.environ['MODE'] = "test"
 
 
 @unittest.skipUnless(os.getenv('UNIT_TESTS'), 'UNIT TEST')
-class SensorDataCollectorUnitTest(unittest.TestCase):
+class SensorDataProcessorUnitTest(unittest.TestCase):
 
-    print('SensorDataCollectorUnitTest...')
+    print('SensorDataProcessorUnitTest...')
 
     def setUp(self):
         self.observer = Mock()
         self.stop_event = Mock()
+        self.pusblisher = Mock()
+        self.strategy = Mock()
 
-        self.topic = "1"
-        self.payload = {
-            "id": "id"
-        }
-        self.event = PubSubEvent(
-            type=CONTROLLER_STATUS,
+        self.area = Area(
+            id=1,
+            visible=True,
+            name="name1",
+            description="old",
+        )
+        self.topic_on = TOPIC_AREA_ACTUATOR_RELAY_ON_CONFIRMATION.format(area=self.area.id)
+        self.topic_off = TOPIC_AREA_ACTUATOR_RELAY_OFF_CONFIRMATION.format(area=self.area.id)
+        self.payload = {}
+        self.event_on_confirmation = PubSubEvent(
+            type=ACTUATOR_RELAY_ON_OK,
             data={
-                "topic": self.topic,
+                "topic": self.topic_on,
+                "payload": json.dumps(self.payload),
+            }
+        )
+        self.event_off_confirmation = PubSubEvent(
+            type=ACTUATOR_RELAY_OFF_OK,
+            data={
+                "topic": self.topic_off,
                 "payload": json.dumps(self.payload),
             }
         )
 
-        self.data_collector = SensorDataCollector(
+        self.data_processor = SensorDataProcessor(
             stop_event=self.stop_event,
             observer=self.observer,
+            pusblisher=self.pusblisher,
+            actuator_strategy=self.strategy
         )
 
     # INNER METHODS
 
     # TESTS
-    @patch.object(SensorDataCollector, '_process_controller_status', return_value=True)
+    @patch.object(SensorDataProcessor, '_control_actuator_sensor_data', return_value=True)
     def test_run_calls_inner_threads(self, mock):
-        self.data_collector.run()
+        self.data_processor.run()
         mock.assert_called_once()
 
     @patch.object(queue.Queue, 'put', return_value=True)
-    def test_update_save_data_into_local_queue_ok(self, mock):
-        self.data_collector.update(
-            event=self.event
+    def test_update_save_data_into_local_queue_on_confirmation_ok(self, mock):
+        self.data_processor.update(
+            event=self.event_on_confirmation
         )
         mock.assert_called_once_with(
             QueueState(
-                topic=self.topic,
+                type=ACTUATOR_RELAY_ON_OK,
+                topic=self.topic_on,
                 payload=json.dumps(self.payload)
             )
         )
 
-    @patch.object(SensorDataCollector, '_save_controller_state', return_value=True)
+    @patch.object(queue.Queue, 'put', return_value=True)
+    def test_update_save_data_into_local_queue_off_confirmation_ok(self, mock):
+        self.data_processor.update(
+            event=self.event_off_confirmation
+        )
+        mock.assert_called_once_with(
+            QueueState(
+                type=ACTUATOR_RELAY_OFF_OK,
+                topic=self.topic_off,
+                payload=json.dumps(self.payload)
+            )
+        )
+
+    @patch.object(ServiceControllers, 'get_by_area')
+    @patch.object(ServiceSensorsHistoric, 'get_last')
+    @patch.object(ServiceSensorsHistoric, 'get')
+    def test_summary_sensor_data_return_summary_ok_1(
+            self, mockHistorical, mockLastSensorData, mockGetControllers):
+        self.controller = Controller(
+            id=1,
+            area=self.area.id,
+            visible=True,
+            name="name1",
+            description="old",
+        )
+        self.sensor_data = SensorData(
+            area_id=self.area.id,
+            controller_id=1,
+            area="name1",
+            controller="name1",
+            humidity=20,
+            temperature=20,
+            raining=True,
+            date=datetime.datetime(2022, 7, 29, 21, 00, 00, 0)
+        )
+        expected = IrrigationActivateActuator(
+            rainning=100.0,
+            humidity=self.sensor_data.humidity,
+            temperature=self.sensor_data.temperature,
+        )
+
+        mockGetControllers.return_value = [
+            self.controller
+        ]
+        mockLastSensorData.return_value = self.sensor_data
+        mockHistorical.return_value = [
+            self.sensor_data, self.sensor_data
+        ]
+
+        summary = self.data_processor._get_summary_sensor_data_area(
+            area=self.area
+        )
+
+        self.assertEqual(summary, expected)
+
+    @patch.object(ServiceControllers, 'get_by_area')
+    @patch.object(ServiceSensorsHistoric, 'get_last')
+    @patch.object(ServiceSensorsHistoric, 'get')
+    def test_summary_sensor_data_no_last_data_return_summary_ok(
+            self, mockHistorical, mockLastSensorData, mockGetControllers):
+        self.controller = Controller(
+            id=1,
+            area=self.area.id,
+            visible=True,
+            name="name1",
+            description="old",
+        )
+        self.sensor_data = SensorData(
+            area_id=self.area.id,
+            controller_id=1,
+            area="name1",
+            controller="name1",
+            humidity=20,
+            temperature=20,
+            raining=True,
+            date=datetime.datetime(2022, 7, 29, 21, 00, 00, 0)
+        )
+        expected = IrrigationActivateActuator(
+            rainning=100.0,
+            humidity=self.sensor_data.humidity,
+            temperature=self.sensor_data.temperature,
+        )
+
+        mockGetControllers.return_value = [
+            self.controller
+        ]
+        # error getting last sensor data but it has data from 24 hours ago
+        mockLastSensorData.return_value = None
+        mockHistorical.return_value = [
+            self.sensor_data, self.sensor_data
+        ]
+
+        expected = IrrigationActivateActuator(
+            rainning=100.0,
+            humidity=0,
+            temperature=0,
+        )
+
+        summary = self.data_processor._get_summary_sensor_data_area(
+            area=self.area
+        )
+
+        self.assertEqual(summary, expected)
+
+    @patch.object(ServiceControllers, 'get_by_area')
+    @patch.object(ServiceSensorsHistoric, 'get_last')
+    @patch.object(ServiceSensorsHistoric, 'get')
+    def test_summary_sensor_data_no_24_hours_data_return_summary_ok(
+            self, mockHistorical, mockLastSensorData, mockGetControllers):
+        self.controller = Controller(
+            id=1,
+            area=self.area.id,
+            visible=True,
+            name="name1",
+            description="old",
+        )
+        self.sensor_data = SensorData(
+            area_id=self.area.id,
+            controller_id=1,
+            area="name1",
+            controller="name1",
+            humidity=20,
+            temperature=20,
+            raining=True,
+            date=datetime.datetime(2022, 7, 29, 21, 00, 00, 0)
+        )
+        expected = IrrigationActivateActuator(
+            rainning=0,
+            humidity=self.sensor_data.humidity,
+            temperature=self.sensor_data.temperature,
+        )
+
+        mockGetControllers.return_value = [
+            self.controller
+        ]
+        mockLastSensorData.return_value = self.sensor_data
+        mockHistorical.return_value = []
+
+        summary = self.data_processor._get_summary_sensor_data_area(
+            area=self.area
+        )
+
+        self.assertEqual(summary, expected)
+
+    @patch.object(ServiceControllers, 'get_by_area')
+    @patch.object(ServiceSensorsHistoric, 'get_last')
+    @patch.object(ServiceSensorsHistoric, 'get')
+    def test_summary_sensor_data_no_controllers_return_summary_ok(
+            self, mockHistorical, mockLastSensorData, mockGetControllers):
+        expected = None
+
+        mockGetControllers.return_value = []
+
+        summary = self.data_processor._get_summary_sensor_data_area(
+            area=self.area
+        )
+
+        self.assertEqual(summary, expected)
+
     @patch.object(queue.Queue, 'get')
-    def test_process_controller_status_does_not_get_data_ok(self, mockQ, mockS):
-        status = "asdasdadasd"
+    def test_wait_for_confirmation_relay_on_return_true_data_in_queue_ok(self, mockQ):
+        expected = True
+        self.queue_state = QueueState(
+            type=ACTUATOR_RELAY_ON_OK,
+            topic="",
+            payload=""
+        )
+
         mockQ.side_effect = [
-            queue.Empty('asd'), status
+            queue.Empty('asd'), self.queue_state
         ]
 
-        self.stop_event = MagicMock()
-        self.stop_event.is_set.side_effect = [
-            False, True
-        ]
-
-        self.data_collector = SensorDataCollector(
-            stop_event=self.stop_event,
-            observer=self.observer,
+        result = self.data_processor._wait_for_confirmation_from_actuator(
+            area=self.area.id,
+            mode_on=True
         )
-        self.data_collector.run()
 
-        mockS.assert_not_called()
+        self.assertEqual(result, expected)
 
-    @patch.object(SensorDataCollector, '_save_controller_state', return_value=True)
     @patch.object(queue.Queue, 'get')
-    def test_process_controller_status_does_get_data_call_save_function_ok(self, mockQ, mockS):
-        status = "asdasdadasd"
-        mockQ.return_value = status
+    def test_wait_for_confirmation_relay_off_return_true_data_in_queue_ok(self, mockQ):
+        expected = True
+        self.queue_state = QueueState(
+            type=ACTUATOR_RELAY_OFF_OK,
+            topic="",
+            payload=""
+        )
+
+        mockQ.side_effect = [
+            queue.Empty('asd'), self.queue_state
+        ]
+
+        result = self.data_processor._wait_for_confirmation_from_actuator(
+            area=self.area.id,
+            mode_on=False
+        )
+
+        self.assertEqual(result, expected)
+
+    @patch.object(queue.Queue, 'get')
+    def test_wait_for_confirmation_relay_on_return_falsa_no_confirmation_ok(self, mockQ):
+        expected = False
+        self.queue_state = QueueState(
+            type=ACTUATOR_RELAY_ON_OK,
+            topic="",
+            payload=""
+        )
+
+        mockQ.side_effect = [
+            queue.Empty('asd'), queue.Empty('asd'), queue.Empty('asd')
+        ]
+
+        result = self.data_processor._wait_for_confirmation_from_actuator(
+            area=self.area.id,
+            mode_on=True
+        )
+
+        self.assertEqual(result, expected)
+
+    @patch.object(queue.Queue, 'get')
+    def test_wait_for_confirmation_relay_off_return_false_no_confirmation_ok(self, mockQ):
+        expected = False
+        self.queue_state = QueueState(
+            type=ACTUATOR_RELAY_OFF_OK,
+            topic="",
+            payload=""
+        )
+
+        mockQ.side_effect = [
+            queue.Empty('asd'), queue.Empty('asd'), queue.Empty('asd')
+        ]
+
+        result = self.data_processor._wait_for_confirmation_from_actuator(
+            area=self.area.id,
+            mode_on=False
+        )
+
+        self.assertEqual(result, expected)
+
+    @patch.object(MessagesServices, 'pub_relay_on', return_value=True)
+    @patch.object(SensorDataProcessor, '_wait_for_confirmation_from_actuator')
+    @patch.object(ServiceIrrigationHistoric, 'insert')
+    def test_handle_activate_actuator_receive_confirmation_insert_data_ok(
+            self, mock, mockConfirmation, mockPub):
+        expected = True
+        mockConfirmation.return_value = expected
+        result = self.data_processor._handle_activate_actuator(
+            area=self.area
+        )
+
+        mock.assert_called_once()
+        self.assertEqual(result, expected)
+
+    @patch.object(MessagesServices, 'pub_relay_on', return_value=True)
+    @patch.object(SensorDataProcessor, '_wait_for_confirmation_from_actuator')
+    @patch.object(ServiceIrrigationHistoric, 'insert')
+    def test_handle_activate_actuator_not_receive_confirmation_not_insert_data_ok(
+            self, mock, mockConfirmation, mockPub):
+        expected = False
+        mockConfirmation.return_value = expected
+        result = self.data_processor._handle_activate_actuator(
+            area=self.area
+        )
+
+        mock.assert_not_called()
+        self.assertEqual(result, expected)
+
+    @patch.object(MessagesServices, 'pub_relay_off', return_value=True)
+    @patch.object(SensorDataProcessor, '_wait_for_confirmation_from_actuator')
+    @patch.object(ServiceIrrigationHistoric, 'end_irrigation')
+    def test_handle_desactivate_actuator_receive_confirmation_end_irrigation_ok(
+            self, mock, mockConfirmation, mockPub):
+        expected = True
+        mockConfirmation.return_value = expected
+        result = self.data_processor._handle_desactivate_actuator(
+            area=self.area
+        )
+
+        mock.assert_called_once()
+        self.assertEqual(result, expected)
+
+    @patch.object(MessagesServices, 'pub_relay_off', return_value=True)
+    @patch.object(SensorDataProcessor, '_wait_for_confirmation_from_actuator')
+    @patch.object(ServiceIrrigationHistoric, 'end_irrigation')
+    def test_handle_desactivate_actuator_not_receive_confirmation_not_insert_data_ok(
+            self, mock, mockConfirmation, mockPub):
+        expected = False
+        mockConfirmation.return_value = expected
+        result = self.data_processor._handle_desactivate_actuator(
+            area=self.area
+        )
+
+        mock.assert_not_called()
+        self.assertEqual(result, expected)
+
+    @patch.object(ServiceAreas, 'get_all')
+    @patch.object(SensorDataProcessor, '_get_summary_sensor_data_area')
+    @patch.object(SensorDataProcessor, '_handle_activate_actuator')
+    def test_control_actuator_sensor_data_needs_to_activate_actuator_call_handler_once_ok(
+            self, mock, mockSummary, mockAreas):
+        self.sensor_data = SensorData(
+            area_id=self.area.id,
+            controller_id=1,
+            area="name1",
+            controller="name1",
+            humidity=10,
+            temperature=20,
+            raining=True,
+            date=datetime.datetime(2022, 7, 29, 21, 00, 00, 0)
+        )
+
         self.stop_event = MagicMock()
         self.stop_event.is_set.side_effect = [
             False, True
         ]
 
-        self.data_collector = SensorDataCollector(
+        mockAreas.return_value = [
+            self.area
+        ]
+
+        mockSummary.return_value = IrrigationActivateActuator(
+            rainning=0,
+            humidity=self.sensor_data.humidity,
+            temperature=self.sensor_data.temperature,
+        )
+
+        self.strategy = SimpleActuatorIrirgationHandler()
+        self.data_processor = SensorDataProcessor(
             stop_event=self.stop_event,
             observer=self.observer,
-        )
-        self.data_collector.run()
-
-        mockS.assert_called_once_with(
-            data=status
+            pusblisher=self.pusblisher,
+            actuator_strategy=self.strategy
         )
 
-    @patch.object(ServiceSensorsHistoric, 'insert', return_value=True)
-    @patch.object(ServiceAreas, 'get_by_id')
-    @patch.object(ServiceControllers, 'get_by_id')
-    def test_save_status_does_not_insert_area_or_controller_none_ok(self, mockC, mockA, mockS):
-        self.area = 500
-        self.controller = 4
-        self.topic = "asdasdsad"
-        self.payload = {
-            'id': 'id_test',
-            'temperature': {
-                'value': 34.6,
-                'units': "celsius",
-            }
-        }
-        self.queue_status = QueueState(
-            topic=self.topic,
-            payload=json.dumps(self.payload),
+        self.data_processor._control_actuator_sensor_data()
+
+        mock.assert_called_once_with(
+            area=self.area
         )
 
-        with self.assertRaises(Exception) as context:
-            self.data_collector._save_controller_state(data=self.queue_status)
-
-        self.assertTrue("bad topic format" in str(context.exception))
-        mockC.assert_not_called()
-        mockA.assert_not_called()
-        mockS.assert_not_called()
-
-    @patch.object(ServiceSensorsHistoric, 'insert', return_value=True)
-    @patch.object(ServiceAreas, 'get_by_id')
-    @patch.object(ServiceControllers, 'get_by_id')
-    def test_save_status_does_not_insert_different_area_area_controller_ok(self, mockC, mockA, mockS):
-        self.area = 500
-        self.type = 1
-        self.controller = 4
-        self.description = "a"
-        self.name = "a"
-        self.visible = True
-        self.topic = TOPIC_AREA_SENSORS_STATUS_CONTROLLER.format(
-            area=self.area,
-            controller=self.controller,
-        )
-        self.payload = {
-            'id': 'id_test',
-            'temperature': {
-                'value': 34.6,
-                'units': "celsius",
-            }
-        }
-        self.queue_status = QueueState(
-            topic=self.topic,
-            payload=json.dumps(self.payload),
+    @patch.object(ServiceAreas, 'get_all')
+    @patch.object(SensorDataProcessor, '_get_summary_sensor_data_area')
+    @patch.object(SensorDataProcessor, '_handle_activate_actuator')
+    def test_control_actuator_sensor_data_needs_to_activate_actuator_many_times_call_handler_once_ok(
+            self, mock, mockSummary, mockAreas):
+        self.sensor_data = SensorData(
+            area_id=self.area.id,
+            controller_id=1,
+            area="name1",
+            controller="name1",
+            humidity=10,
+            temperature=20,
+            raining=True,
+            date=datetime.datetime(2022, 7, 29, 21, 00, 00, 0)
         )
 
-        self.areaC = Area(
-            id=self.area,
-            type=self.type,
-            description=self.description,
-            name=self.name,
-            visible=self.visible,
+        self.stop_event = MagicMock()
+        self.stop_event.is_set.side_effect = [
+            False, False, True
+        ]
+
+        mock.return_value = True
+
+        mockAreas.return_value = [
+            self.area
+        ]
+
+        mockSummary.return_value = IrrigationActivateActuator(
+            rainning=0,
+            humidity=self.sensor_data.humidity,
+            temperature=self.sensor_data.temperature,
         )
 
-        self.controllerC = Controller(
-            id=self.controller,
-            area=1,
-            description=self.description,
-            key=self.name,
-            name=self.name,
-            visible=self.visible,
+        self.strategy = SimpleActuatorIrirgationHandler()
+        self.data_processor = SensorDataProcessor(
+            stop_event=self.stop_event,
+            observer=self.observer,
+            pusblisher=self.pusblisher,
+            actuator_strategy=self.strategy
         )
 
-        mockC.return_value = self.controllerC
-        mockA.return_value = self.areaC
+        self.data_processor._control_actuator_sensor_data()
 
-        with self.assertRaises(Exception) as context:
-            self.data_collector._save_controller_state(data=self.queue_status)
-
-        self.assertTrue("does not belong to area" in str(context.exception))
-        mockC.assert_called_once_with(
-            controller=self.controller,
-            all_visibility=True
-        )
-        mockA.assert_called_once_with(
-            area=self.area,
-            all_visibility=True
-        )
-        mockS.assert_not_called()
-
-    @patch.object(ServiceSensorsHistoric, 'insert', return_value=True)
-    @patch.object(ServiceAreas, 'get_by_id')
-    @patch.object(ServiceControllers, 'get_by_id')
-    def test_save_status_does_insert_ok(self, mockC, mockA, mockS):
-        self.area = 500
-        self.controller = 4
-        self.description = "a"
-        self.name = "a"
-        self.visible = True
-        self.topic = TOPIC_AREA_SENSORS_STATUS_CONTROLLER.format(
-            area=self.area,
-            controller=self.controller,
-        )
-        self.payload = {
-            'id': 'id_test',
-            'temperature': {
-                'value': 34.6,
-                'units': "celsius",
-            }
-        }
-        self.queue_status = QueueState(
-            topic=self.topic,
-            payload=json.dumps(self.payload),
+        mock.assert_called_once_with(
+            area=self.area
         )
 
-        self.areaC = Area(
-            id=self.area,
-            type=self.type,
-            description=self.description,
-            name=self.name,
-            visible=self.visible,
+    @patch.object(ServiceAreas, 'get_all')
+    @patch.object(SensorDataProcessor, '_get_summary_sensor_data_area')
+    @patch.object(SensorDataProcessor, '_handle_desactivate_actuator')
+    def test_control_actuator_sensor_data_needs_to_desactivate_actuator_call_handler_once_ok(
+            self, mock, mockSummary, mockAreas):
+        self.sensor_data = SensorData(
+            area_id=self.area.id,
+            controller_id=1,
+            area="name1",
+            controller="name1",
+            humidity=90,
+            temperature=20,
+            raining=True,
+            date=datetime.datetime(2022, 7, 29, 21, 00, 00, 0)
         )
 
-        self.controllerC = Controller(
-            id=self.controller,
-            area=self.area,
-            description=self.description,
-            key=self.name,
-            name=self.name,
-            visible=self.visible,
+        self.stop_event = MagicMock()
+        self.stop_event.is_set.side_effect = [
+            False, True
+        ]
+
+        mockAreas.return_value = [
+            self.area
+        ]
+
+        mockSummary.return_value = IrrigationActivateActuator(
+            rainning=0,
+            humidity=self.sensor_data.humidity,
+            temperature=self.sensor_data.temperature,
         )
 
-        mockC.return_value = self.controllerC
-        mockA.return_value = self.areaC
-
-        self.data_collector._save_controller_state(data=self.queue_status)
-
-        mockC.assert_called_once_with(
-            controller=self.controller,
-            all_visibility=True
+        self.strategy = SimpleActuatorIrirgationHandler()
+        self.data_processor = SensorDataProcessor(
+            stop_event=self.stop_event,
+            observer=self.observer,
+            pusblisher=self.pusblisher,
+            actuator_strategy=self.strategy
         )
-        mockA.assert_called_once_with(
-            area=self.area,
-            all_visibility=True
+
+        self.data_processor.actuator_on = True
+
+        self.data_processor._control_actuator_sensor_data()
+
+        mock.assert_called_once_with(
+            area=self.area
         )
-        mockS.assert_called_once()
 
 
 if __name__ == '__main__':
