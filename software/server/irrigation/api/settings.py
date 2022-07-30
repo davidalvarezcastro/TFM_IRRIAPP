@@ -17,3 +17,4 @@ API_AREA_CONTROLLERS = "/controller"
 API_GET_ALL_CONTROLLERS = "/controllers"
 
 API_GET_HISTORIC_SENSOR_DATA_CONTROLLER = "/controller/{controller}/sensors/historical"
+API_GET_HISTORICAL_ACTUATOR_DATA_AREA = "/area/{area}/actuator/historical"

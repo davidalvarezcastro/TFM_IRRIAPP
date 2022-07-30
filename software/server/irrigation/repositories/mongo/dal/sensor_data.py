@@ -14,6 +14,11 @@ class SensorDataDAL(InterfaceSensorsHistoricDAL):
     mongo: MongoManager = attr.ib()
 
     def init_from_dict_to_model(self, result: dict) -> SensorData:
+        try:
+            date = result.get('date', '').replace(microsecond=0)
+        except Exception as e:
+            date = result.get('date', '')
+
         return SensorData(
             controller_id=result.get('controller_id'),
             controller=result.get('controller'),
@@ -22,7 +27,7 @@ class SensorDataDAL(InterfaceSensorsHistoricDAL):
             humidity=result.get('humidity'),
             raining=result.get('raining'),
             temperature=result.get('temperature'),
-            date=result.get('date')
+            date=date
         )
 
     def insert(self, data: SensorData) -> typing.Tuple[str, ExceptionDatabase]:

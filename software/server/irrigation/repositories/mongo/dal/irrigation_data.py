@@ -15,12 +15,21 @@ class IrrigationDataDAL(InterfaceIrrigationHistoricDAL):
     mongo: MongoManager = attr.ib()
 
     def init_from_dict_to_model(self, result: dict) -> IrrigationData:
+        try:
+            start_date = result.get('start_date', '').replace(microsecond=0)
+        except Exception as e:
+            start_date = result.get('start_date', '')
+        try:
+            end_date = result.get('end_date', '').replace(microsecond=0)
+        except Exception as e:
+            end_date = result.get('end_date', '')
+
         return IrrigationData(
             area_id=result.get('area_id'),
             area=result.get('area'),
             irrigation=result.get('irrigation'),
-            start_date=result.get('start_date', ''),
-            end_date=result.get('end_date', ''),
+            start_date=start_date,
+            end_date=end_date,
         )
 
     def insert(self, data: IrrigationData) -> typing.Tuple[str, ExceptionDatabase]:
