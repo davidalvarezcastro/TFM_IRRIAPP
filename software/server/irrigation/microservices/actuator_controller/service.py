@@ -12,6 +12,7 @@ from domain.messages.services import MessagesServices
 from domain.observer.actuator_observer import ActuatorEventsObserver
 from microservices.actuator_controller.data_processor import SensorDataProcessor
 from application.actuator.models.simple_actuator_irrigation import SimpleActuatorIrirgationHandler
+from application.actuator.models.fuzzy_logic_actuator_irrigation import FuzzyLogicActuatorIrirgationHandler
 
 
 class MicroserviceHandleActuator():
@@ -44,6 +45,7 @@ class MicroserviceHandleActuator():
         self.messages_manager.init_subs()
 
         self.actuator_activation_strategy = SimpleActuatorIrirgationHandler()
+        # self.actuator_activation_strategy = FuzzyLogicActuatorIrirgationHandler()
 
         # initialize data processing
         self.data_processor = SensorDataProcessor(

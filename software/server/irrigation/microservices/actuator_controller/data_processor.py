@@ -12,12 +12,11 @@ from patterns.pubsub import PubSubEvent, Sub
 from domain.models.areas import Area
 from domain.observer.topics import ACTUATOR_RELAY_ON_OK, ACTUATOR_RELAY_OFF_OK
 from domain.messages.services import MessagesServices
-from domain.models.controllers import Controller
 from application.services.areas import ServiceAreas
 from domain.models.irrigation_data import IrrigationData
 from application.services.controllers import ServiceControllers
 from application.services.sensor_data import ServiceSensorsHistoric
-from domain.models.sensor_data_historic import QuerySensorData, SensorData
+from domain.models.sensor_data_historic import QuerySensorData
 from domain.observer.controller_observer import ControllerEventsObserver
 from application.services.irrigation_data import ServiceIrrigationHistoric
 from domain.models.irrigation_actuator_algorithm import IrrigationActivateActuator
