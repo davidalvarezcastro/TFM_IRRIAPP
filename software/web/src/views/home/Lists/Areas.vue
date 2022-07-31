@@ -24,6 +24,7 @@ const emit = defineEmits<{
   (e: "expanded", area: Area, cb: () => void): void;
   (e: "shrinked", area: Area, cb: () => void): void;
   (e: "editArea", area: Area, cb: () => void): void;
+  (e: "detailArea", area: Area, cb: () => void): void;
   (e: "deleteArea", area: Area, cb: () => void): void;
   (e: "addController", area: Area, cb: () => void): void;
 }>();
@@ -37,6 +38,9 @@ const emitShrinked = function (area: Area, cb: () => void) {
 // areas
 const emitEditArea = function (area: Area, cb: () => void) {
   emit("editArea", area, cb);
+};
+const emitDetailArea = function (area: Area, cb: () => void) {
+  emit("detailArea", area, cb);
 };
 const emitDeleteArea = function (area: Area, cb: () => void) {
   emit("deleteArea", area, cb);
@@ -62,6 +66,9 @@ const handleClickShrink = (area: Area, cb: () => void) => {
 };
 const handleClickEdit = (area: Area, cb: () => void) => {
   emitEditArea(area, cb);
+};
+const handleClickDetail = (area: Area, cb: () => void) => {
+  emitDetailArea(area, cb);
 };
 const handleClickDelete = (area: Area, cb: () => void) => {
   swal({
@@ -91,6 +98,7 @@ const expanded: Ref<Array<number>> = ref([]);
         v-on:shrinked="handleClickShrink"
         v-on:addController="handleClickAddController(area)"
         v-on:editArea="handleClickEdit"
+        v-on:detailArea="handleClickDetail"
         v-on:deleteArea="handleClickDelete"
       >
       </CardArea>

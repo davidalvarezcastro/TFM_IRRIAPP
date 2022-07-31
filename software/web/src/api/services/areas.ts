@@ -1,12 +1,16 @@
 import { Area } from '../../types/areas';
 import { axios, ErrorResponse, Response } from '../axios';
-import { API_AREAS_DELETE, API_AREAS_GET_ALL, API_AREAS_POST, API_AREAS_PUT } from '../urls';
+import { API_AREAS_DELETE, API_AREAS_GET_ALL, API_AREAS_GET_AREA, API_AREAS_POST, API_AREAS_PUT } from '../urls';
 
 
 interface ResponseGetAreas extends Response {
     data: {
         areas: Record<string, string>[];
     };
+}
+
+interface ResponseGetArea extends Response {
+    data: Record<string, string>;
 }
 
 interface ResponsePPDArea extends Response {
@@ -32,6 +36,25 @@ export const getAreas = async (allVisibility: boolean = false): Promise<Area[]> 
                     date: i.date,
                 } as unknown as Area
             });
+        }
+
+        return Promise.reject();
+    })
+}
+
+export const getArea = async (area: number, allVisibility: boolean = false): Promise<Area> => {
+    const queryParameters = `?all_visibility=${allVisibility}`;
+
+    return axios.get<any, ResponseGetArea>(`${API_AREAS_GET_AREA.replace(':area', area.toString())}${queryParameters}`).then((data) => {
+        if (data) {
+            return {
+                id: parseInt(data.data.id),
+                name: data.data.name,
+                description: data.data.description,
+                type: parseInt(data.data.id),
+                visible: data.data.visible,
+                date: data.data.date,
+            } as unknown as Area
         }
 
         return Promise.reject();

@@ -18,7 +18,7 @@ import {
   SENSO_DATA_HISTORICAL_RANGE_HOURS,
   TIMER_FETCH_SENSOR_DATA,
 } from "../../globals";
-import HistoricalGraph from "../../components/HistoricalGraph.vue";
+import SensorDataHistoricalGraph from "../../components/SensorDataHistoricalGraph.vue";
 import FormHistorical from "../../components/FormHistorical.vue";
 
 name: "DetailControllerView";
@@ -164,7 +164,10 @@ watch(
 <template>
   <div class="detail">
     <div v-if="!empty(controller)">
-      <h1>{{ controller.name }}</h1>
+      <h1>
+        Sensor Data Historical -
+        <span style="font-style: italic">{{ controller.name }}</span>
+      </h1>
 
       <div>
         <FormHistorical
@@ -187,7 +190,7 @@ watch(
           </v-progress-circular>
         </div>
 
-        <HistoricalGraph v-else :data="sensors" :reset="resetChart" />
+        <SensorDataHistoricalGraph v-else :data="sensors" :reset="resetChart" />
       </div>
 
       <div v-else class="error-box">

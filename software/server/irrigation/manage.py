@@ -76,7 +76,7 @@ def test(unit, integration, acceptance, all, coverage, browser, args):
             '-m',
             'unittest',
             'tests/__main__.py',
-            # 'tests/integration/api/test_api_controllers.py',
+            # 'tests/unit/domain/test_actuator_observer.py',
             '&&',
             'coverage',
             'html',

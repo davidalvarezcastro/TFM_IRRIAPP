@@ -215,6 +215,60 @@ class DALControllersIntegrationTest(unittest.TestCase):
 
         self.assertIsNone(result)
 
+    def test_get_by_area_function_return_array__all_visibility_ok(self):
+        self.controller_db.add()
+        self.id = 2
+        self.description = "description 2"
+        self.controller_db = ControllersORM(
+            id=self.id,
+            area=self.area,
+            description=self.description,
+            key=self.key,
+            name=self.name,
+            visible=False,
+        )
+        self.controller_db.add()
+
+        result = self.dal.get_by_area(
+            area=self.area,
+            all_visibility=True
+        )
+
+        self.assertIsNotNone(result)
+        self.assertTrue(len(result) == 2)
+
+    def test_get_by_area_function_return_array_only_visibles_ok(self):
+        self.controller_db.add()
+        self.id = 2
+        self.description = "description 2"
+        self.controller_db = ControllersORM(
+            id=self.id,
+            area=self.area,
+            description=self.description,
+            key=self.key,
+            name=self.name,
+            visible=False,
+        )
+        self.controller_db.add()
+
+        result = self.dal.get_by_area(
+            area=self.area,
+            all_visibility=False
+        )
+
+        self.assertIsNotNone(result)
+        self.assertTrue(len(result) == 1)
+
+    def test_get_by_area_function_return_empty_array_ok(self):
+        expected = []
+        result = self.dal.get_by_area(
+            area=self.area
+        )
+
+        self.assertIsNotNone(result)
+        self.assertTrue(len(result) == 0)
+        self.assertEqual(result, expected)
+
     def test_get_all_function_return_array__all_visibility_ok(self):
         self.controller_db.add()
         self.id = 2

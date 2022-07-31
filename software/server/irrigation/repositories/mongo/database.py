@@ -23,6 +23,11 @@ class MongoManager:
         """
         return self.connection['col'].find(query)
 
+    def find_last(self, query: dict) -> typing.List[typing.Any]:
+        """Wrapper for mongodb find last element inserted into the collection (helps with testing)
+        """
+        return self.connection['col'].find(query).limit(1).sort([('$natural', -1)])
+
     def closeMongoConnection(self) -> None:
         try:
             if self.connection is not None and self.connection.get('connection') is not None:

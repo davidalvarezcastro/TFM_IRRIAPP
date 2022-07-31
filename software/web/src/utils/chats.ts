@@ -6,7 +6,7 @@ export const CHART_COLORS = {
 };
 
 const RANDOM_COLORS = [
-  "red",
+  "#FF0000",
   "#acc236",
   "#4dc9f6",
   "#f67019",

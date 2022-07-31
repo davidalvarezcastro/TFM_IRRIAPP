@@ -102,6 +102,37 @@ class DALSensorDataUnitTest(unittest.TestCase):
         self.assertEqual(result.__dict__(), array_data[0])
 
     @patch.object(MongoManager, 'closeMongoConnection', return_value=True)
+    def test_get_last_sensor_data_interval_dates_return_data_ok(self, mock):
+        array_data = []
+        # mock data
+        for i in range(4):
+            data = {
+                'controller_id': 1,
+                'controller': f"controller{i}",
+                'area_id': 1,
+                'area': f"area{i}",
+                'humidity': 5 * (i + 1),
+                'temperature': 10 * (i + 1),
+                'raining': 0,
+                'date': datetime.datetime(2022, 7, 5 + i, 21, 00, 00, 0),
+            }
+            array_data.append(data)
+            result = self.manager.connection['col'].insert_one(data)
+
+        result = self.dao.get_last(
+            query=QuerySensorData(
+                start_date=datetime.datetime(2022, 7, 2, 21, 00, 00, 0),
+                end_date=datetime.datetime(2022, 7, 7, 21, 00, 00, 0),
+            )
+        )
+
+        # remove _id and check
+        del array_data[len(array_data) - 1]['_id']
+
+        mock.assert_called_once()
+        self.assertEqual(result.__dict__(), array_data[len(array_data) - 1])
+
+    @patch.object(MongoManager, 'closeMongoConnection', return_value=True)
     def test_query_sensor_data_interval_dates_return_data_ok(self, mock):
         array_data = []
         # mock data

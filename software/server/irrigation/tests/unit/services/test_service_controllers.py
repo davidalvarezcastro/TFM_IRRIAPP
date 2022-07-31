@@ -113,6 +113,14 @@ class ServiceControllersUnitTest(unittest.TestCase):
 
         mock.assert_called_once()
 
+    @patch.object(ControllersDAL, 'get_by_area')
+    def test_controller_get_by_area_call_dal_get_by_area_ok(self, mock):
+        self.controller.get_by_area(
+            area=self.area
+        )
+
+        mock.assert_called_once()
+
     @patch.object(ControllersDAL, 'get_all')
     def test_controller_get_all_call_dal_get_all_ok(self, mock):
         self.controller.get_all()

@@ -14,6 +14,11 @@ class SensorDataDAL(InterfaceSensorsHistoricDAL):
     mongo: MongoManager = attr.ib()
 
     def init_from_dict_to_model(self, result: dict) -> SensorData:
+        try:
+            date = result.get('date', '').replace(microsecond=0)
+        except Exception as e:
+            date = result.get('date', '')
+
         return SensorData(
             controller_id=result.get('controller_id'),
             controller=result.get('controller'),
@@ -22,7 +27,7 @@ class SensorDataDAL(InterfaceSensorsHistoricDAL):
             humidity=result.get('humidity'),
             raining=result.get('raining'),
             temperature=result.get('temperature'),
-            date=result.get('date')
+            date=date
         )
 
     def insert(self, data: SensorData) -> typing.Tuple[str, ExceptionDatabase]:
@@ -72,6 +77,39 @@ class SensorDataDAL(InterfaceSensorsHistoricDAL):
                 result.append(
                     self.init_from_dict_to_model(result=data)
                 )
+        except Exception as e:
+            raise ExceptionDatabase(type=GENERAL_ERROR, msg=str(e))
+        finally:
+            self.mongo.closeMongoConnection()
+
+        return result
+
+    def get_last(self, query: QuerySensorData) -> SensorData:
+        result = []
+        query_mongo = {}
+
+        try:
+            db = self.mongo
+
+            # parse sensor query
+            for value in query.get_equal_values():
+                query_mongo[value] = {
+                    '$eq': getattr(query, value)
+                }
+            for value in query.get_greater_equals_than_values():
+                query_mongo[value] = {
+                    '$gte': getattr(query, value)
+                }
+
+            aux = db.find_last(
+                query=query_mongo,
+            )
+            aux = list(aux)
+
+            if len(aux) > 0:
+                return self.init_from_dict_to_model(result=aux[0])
+            else:
+                return None
         except Exception as e:
             raise ExceptionDatabase(type=GENERAL_ERROR, msg=str(e))
         finally:

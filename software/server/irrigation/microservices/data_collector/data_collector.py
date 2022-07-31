@@ -1,9 +1,10 @@
+import logging
 import attr
 import threading
 import time
 import queue
 
-from utils import logger_error, get_now
+from utils import logger_error, get_now, Log
 from patterns.pubsub import PubSubEvent, Sub
 from domain.models.areas import Area
 from domain.observer.topics import CONTROLLER_STATUS
@@ -14,6 +15,9 @@ from application.services.sensor_data import ServiceSensorsHistoric
 from domain.models.sensor_data_historic import SensorData
 from domain.observer.controller_observer import ControllerEventsObserver
 from microservices.data_collector.queue_status import QueueState
+
+
+_LOGGER = Log(logger=logging.getLogger('irrigation'))
 
 
 @attr.s
@@ -43,6 +47,7 @@ class SensorDataCollector(Sub):
     def update(self, event: PubSubEvent) -> None:
         try:
             if event.type == CONTROLLER_STATUS:
+                _LOGGER.debug(f"\t\tnew sensor status: {event}")
                 topic = event.data.get('topic', None)
                 payload = event.data.get('payload', None)
 
@@ -93,6 +98,7 @@ class SensorDataCollector(Sub):
             if controller_info.area != area_id:
                 raise Exception(f"controler {controller_info} does not belong to area {area_id}")
 
+            _LOGGER.debug("\tinserting data into mongodb... ")
             self.service_sensor_data.insert(
                 data=SensorData(
                     area_id=area_id,
@@ -114,6 +120,7 @@ class SensorDataCollector(Sub):
             while not self.stop_event.is_set():
                 try:
                     new_state: QueueState = self.queue_status.get(block=False)
+                    _LOGGER.debug(f"processing new sensor status: {new_state}")
                     self._save_controller_state(
                         data=new_state
                     )

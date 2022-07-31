@@ -216,6 +216,34 @@ class DALControllersUnitTest(unittest.TestCase):
         mock.assert_not_called()
 
     @patch('repositories.database.dal.controllers.session_scope')
+    def test_get_by_area_returns_array_ok(self, mockFilter):
+        mockFilter.return_value.__enter__.return_value.query.return_value.filter_by.return_value.all.return_value = [
+            self.controller_db]
+
+        result = self.dal.get_by_area(area=self.area)
+        expected = [
+            Controller(
+                id=self.controller_db.id,
+                area=self.controller_db.area,
+                name=self.controller_db.name,
+                description=self.controller_db.description,
+                key=self.controller_db.key,
+                visible=self.controller_db.visible,
+                date=self.controller_db.date
+            )
+        ]
+
+        self.assertEqual(result, expected)
+
+    @patch('repositories.database.dal.controllers.session_scope')
+    def test_get_by_area_returns_empty_array_ok(self, mockFilter):
+        mockFilter.return_value.__enter__.return_value.query.return_value.filter_by.return_value.all.return_value = []
+
+        result = self.dal.get_by_area(area=self.area)
+
+        self.assertTrue(len(result) == 0)
+
+    @patch('repositories.database.dal.controllers.session_scope')
     def test_get_all_returns_array_ok(self, mockFilter):
         mockFilter.return_value.__enter__.return_value.query.return_value.filter_by.return_value.all.return_value = [
             self.controller_db]

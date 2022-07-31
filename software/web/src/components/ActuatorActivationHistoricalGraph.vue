@@ -1,20 +1,20 @@
 <script setup lang="ts">
 import { PropType, computed, watch } from "vue";
-import { empty, getColor } from "../utils/index";
-import { SensorData } from "../types/sensor_data";
+import { changeTimezone, empty, getColor } from "../utils/index";
+import { Actuator } from "../types/actuator";
 import { Chart, registerables, ChartItem } from "chart.js";
 import "chartjs-adapter-moment";
 
 Chart.register(...registerables);
 
-name: "HistoricalGraph";
+name: "ActuatorActivationHistoricalGraph";
 
 /**
  * Component's attribrutes
  */
 const props = defineProps({
   data: {
-    type: Array as PropType<SensorData[]>,
+    type: Array as PropType<Actuator[]>,
     required: true,
   },
   reset: {
@@ -26,7 +26,7 @@ const props = defineProps({
 let chart: Chart = null;
 
 const getGraphName = computed(() => {
-  return "historical-sensor-data";
+  return "historical-actuator-activator";
 });
 
 const ctx = computed((): ChartItem => {
@@ -61,10 +61,7 @@ const createChart = (
       maintainAspectRatio: false,
       plugins: {
         legend: {
-          position: "right",
-          labels: {
-            padding: 25,
-          },
+          display: false,
         },
         title: {
           display: true,
@@ -88,9 +85,8 @@ const createChart = (
           type: "time",
           offset: true,
           time: {
-            unit: "minute",
             displayFormats: {
-              hour: "HH:mm:ss",
+              hour: "YYYY-MM-DD HH:mm:ss",
             },
           },
           title: {
@@ -107,7 +103,7 @@ const createChart = (
           max: 100,
           min: 0,
           title: {
-            text: "Sensor Data",
+            text: "Activate?",
             display: true,
           },
         },
@@ -116,64 +112,84 @@ const createChart = (
   });
 };
 
-const handleDraw = (data: SensorData[], redraw: boolean = false): void => {
+const handleDraw = (data: Actuator[], redraw: boolean = false): void => {
   let datasets: Array<Record<string, unknown>> = [];
   let xAxis: Array<string> = [];
   let i = 0;
 
   try {
-    const dataInfoTemperature = [];
-    const dataInfoHumidity = [];
-    const dataInfoRaining = [];
+    const dataInfoActuator = [];
 
-    data.forEach((sensor) => {
-      dataInfoTemperature.push({
-        x: sensor.date,
-        y: sensor.temperature,
+    let color = getColor(2);
+    data.forEach((actuator) => {
+      const startDate = new Date(
+        changeTimezone(new Date(actuator.start_date).getTime())
+      )
+        .toISOString()
+        .split(".")[0]
+        .replace("T", " ");
+      const endDate = new Date(
+        changeTimezone(new Date(actuator.end_date).getTime())
+      )
+        .toISOString()
+        .split(".")[0]
+        .replace("T", " ");
+
+      datasets.push({
+        // @ts-ignore
+        data: [
+          {
+            x: startDate,
+            y: 100,
+          },
+          {
+            x: endDate,
+            y: 100,
+          },
+        ],
+        borderColor: color,
+        backgroundColor: color,
+        fillColor: "#FF1717",
+        fill: {
+          target: true,
+          above: color + "40",
+          below: color + "40",
+        },
+        borderWidth: 10,
       });
-      dataInfoHumidity.push({
-        x: sensor.date,
-        y: sensor.humidity,
-      });
-      dataInfoRaining.push({
-        x: sensor.date,
-        y: sensor.raining ? 100 : 0,
-      });
+      // dataInfoActuator.push([
+      //   {
+      //     x: startDate,
+      //     y: 100,
+      //   },
+      //   {
+      //     x: endDate,
+      //     y: 100,
+      //   },
+      // ]);
     });
 
-    let color = getColor(0);
-    datasets.push({
-      label: `Temperature`,
-      // @ts-ignore
-      data: dataInfoTemperature,
-      borderColor: color,
-      backgroundColor: color,
-      fillColor: "#FF1717",
-      borderWidth: 2,
-    });
-    color = getColor(1);
-    datasets.push({
-      label: `Humidity`,
-      // @ts-ignore
-      data: dataInfoHumidity,
-      borderColor: color,
-      backgroundColor: color,
-      fillColor: "#FF1717",
-      borderWidth: 2,
-    });
-    color = getColor(2);
-    datasets.push({
-      type: "bar",
-      label: `Raining`,
-      // @ts-ignore
-      data: dataInfoRaining,
-      borderColor: color,
-      backgroundColor: color,
-    });
+    // let color = getColor(0);
+    // datasets.push({
+    //   label: `Activation`,
+    //   // @ts-ignore
+    //   data: dataInfoActuator,
+    //   borderColor: color,
+    //   backgroundColor: color,
+    //   fillColor: "#FF1717",
+    //   fill: {
+    //     target: true,
+    //     above: color + "40",
+    //     below: color + "40",
+    //   },
+    //   borderWidth: 10,
+    // });
+
+    console.log(datasets);
 
     if (!redraw && empty(chart)) {
       chart = createChart(
-        "Sensor Data - Historical",
+        "Actuator Activation - Historical",
         ctx.value,
         xAxis,
         datasets,

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-    controllers status observer tests
+    microservice sensor data recollector
 """
 import json
 import os

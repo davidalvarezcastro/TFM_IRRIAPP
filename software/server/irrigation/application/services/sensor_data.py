@@ -21,3 +21,8 @@ class ServiceSensorsHistoric():
         return SensorDataDAL(
             mongo=MongoManager(collection=db_mongo_settings.COLLECTION_SENSORS)
         ).get(query=query)
+
+    def get_last(self, query: QuerySensorData) -> SensorData:
+        return SensorDataDAL(
+            mongo=MongoManager(collection=db_mongo_settings.COLLECTION_SENSORS)
+        ).get_last(query=query)
