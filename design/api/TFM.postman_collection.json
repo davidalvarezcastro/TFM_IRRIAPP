@@ -1,0 +1,696 @@
+{
+	"info": {
+		"_postman_id": "ab6c1bd7-a6c9-474d-ac3f-f72798c2730a",
+		"name": "TFM",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "495444"
+	},
+	"item": [
+		{
+			"name": "Area Types",
+			"item": [
+				{
+					"name": "Area Types",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://{{server}}/api/1.0/irrigation/area/types",
+							"protocol": "http",
+							"host": [
+								"{{server}}"
+							],
+							"path": [
+								"api",
+								"1.0",
+								"irrigation",
+								"area",
+								"types"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Area Type",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://{{server}}/api/1.0/irrigation/area/type/5",
+							"protocol": "http",
+							"host": [
+								"{{server}}"
+							],
+							"path": [
+								"api",
+								"1.0",
+								"irrigation",
+								"area",
+								"type",
+								"5"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Area Type",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"description\": \"this is a api test\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://{{server}}/api/1.0/irrigation/area/type",
+							"protocol": "http",
+							"host": [
+								"{{server}}"
+							],
+							"path": [
+								"api",
+								"1.0",
+								"irrigation",
+								"area",
+								"type"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Area Type",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"description\": \"this is a api test (new description)\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://{{server}}/api/1.0/irrigation/area/type/10",
+							"protocol": "http",
+							"host": [
+								"{{server}}"
+							],
+							"path": [
+								"api",
+								"1.0",
+								"irrigation",
+								"area",
+								"type",
+								"10"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Area Type",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "http://{{server}}/api/1.0/irrigation/area/type/13",
+							"protocol": "http",
+							"host": [
+								"{{server}}"
+							],
+							"path": [
+								"api",
+								"1.0",
+								"irrigation",
+								"area",
+								"type",
+								"13"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Areas",
+			"item": [
+				{
+					"name": "Areas",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://{{server}}/api/1.0/irrigation/areas",
+							"protocol": "http",
+							"host": [
+								"{{server}}"
+							],
+							"path": [
+								"api",
+								"1.0",
+								"irrigation",
+								"areas"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Area",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://{{server}}/api/1.0/irrigation/area/3?all_visibility=1",
+							"protocol": "http",
+							"host": [
+								"{{server}}"
+							],
+							"path": [
+								"api",
+								"1.0",
+								"irrigation",
+								"area",
+								"3"
+							],
+							"query": [
+								{
+									"key": "all_visibility",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Area",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"name_testing_api_rest\",\n    \"description\": \"this is a api test for area creation\",\n    \"visible\": 1,\n    \"type\": 1\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://{{server}}/api/1.0/irrigation/area",
+							"protocol": "http",
+							"host": [
+								"{{server}}"
+							],
+							"path": [
+								"api",
+								"1.0",
+								"irrigation",
+								"area"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Area",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"description\": \"new description jojijiji\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://{{server}}/api/1.0/irrigation/area/5",
+							"protocol": "http",
+							"host": [
+								"{{server}}"
+							],
+							"path": [
+								"api",
+								"1.0",
+								"irrigation",
+								"area",
+								"5"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Area",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "http://{{server}}/api/1.0/irrigation/area/4",
+							"protocol": "http",
+							"host": [
+								"{{server}}"
+							],
+							"path": [
+								"api",
+								"1.0",
+								"irrigation",
+								"area",
+								"4"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Controllers",
+			"item": [
+				{
+					"name": "Controllers",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://{{server}}/api/1.0/irrigation/controllers",
+							"protocol": "http",
+							"host": [
+								"{{server}}"
+							],
+							"path": [
+								"api",
+								"1.0",
+								"irrigation",
+								"controllers"
+							],
+							"query": [
+								{
+									"key": "all_visibility",
+									"value": "1",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Controller",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://{{server}}/api/1.0/irrigation/controller/1?all_visibility=1",
+							"protocol": "http",
+							"host": [
+								"{{server}}"
+							],
+							"path": [
+								"api",
+								"1.0",
+								"irrigation",
+								"controller",
+								"1"
+							],
+							"query": [
+								{
+									"key": "all_visibility",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Controller",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"area\": 3,\n    \"name\": \"controller_test_api_1\",\n    \"description\": \"this is a api test for controllers creation\",\n    \"visible\": 1\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://{{server}}/api/1.0/irrigation/controller",
+							"protocol": "http",
+							"host": [
+								"{{server}}"
+							],
+							"path": [
+								"api",
+								"1.0",
+								"irrigation",
+								"controller"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Controller",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"description\": \"new description\",\n    \"visible\": 0\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://{{server}}/api/1.0/irrigation/controller/3",
+							"protocol": "http",
+							"host": [
+								"{{server}}"
+							],
+							"path": [
+								"api",
+								"1.0",
+								"irrigation",
+								"controller",
+								"3"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Controller",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "http://{{server}}/api/1.0/irrigation/controller/3",
+							"protocol": "http",
+							"host": [
+								"{{server}}"
+							],
+							"path": [
+								"api",
+								"1.0",
+								"irrigation",
+								"controller",
+								"3"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Historical",
+			"item": [
+				{
+					"name": "Sensor Data",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://{{server}}/api/1.0/irrigation/controller/2/sensors/historical?humidity=25.6&start_date=2022-07-18T22:10:00&end_date=2022-07-30T22:15:00",
+							"protocol": "http",
+							"host": [
+								"{{server}}"
+							],
+							"path": [
+								"api",
+								"1.0",
+								"irrigation",
+								"controller",
+								"2",
+								"sensors",
+								"historical"
+							],
+							"query": [
+								{
+									"key": "humidity",
+									"value": "25.6"
+								},
+								{
+									"key": "start_date",
+									"value": "2022-07-18T22:10:00"
+								},
+								{
+									"key": "end_date",
+									"value": "2022-07-30T22:15:00"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Actuator Confirmation",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://{{server}}/api/1.0/irrigation/area/2/actuator/historical?start_date=2022-07-30T10:10:00&end_date=2022-07-30T22:15:00",
+							"protocol": "http",
+							"host": [
+								"{{server}}"
+							],
+							"path": [
+								"api",
+								"1.0",
+								"irrigation",
+								"area",
+								"2",
+								"actuator",
+								"historical"
+							],
+							"query": [
+								{
+									"key": "start_date",
+									"value": "2022-07-30T10:10:00"
+								},
+								{
+									"key": "end_date",
+									"value": "2022-07-30T22:15:00"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Auth",
+			"item": [
+				{
+					"name": "Users",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [
+							{
+								"warning": "This is a duplicate header and will be overridden by the Authorization header generated by Postman.",
+								"key": "Authorization",
+								"value": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoxLCJ1c2VybmFtZSI6ImFkbWluIiwiYWRtaW4iOnRydWUsImV4cCI6MTY1ODYzMDA1N30.Qkki9NrU3wKc-x0f4YZt-XSMMOEmosoker2jOLECHzs",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "http://{{server_auth}}/users/api/v1.0/users",
+							"protocol": "http",
+							"host": [
+								"{{server_auth}}"
+							],
+							"path": [
+								"users",
+								"api",
+								"v1.0",
+								"users"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Login",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"user\": \"admin\",\n    \"password\": \"admin\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://{{server_auth}}/users/api/v1.0/auth/login",
+							"protocol": "http",
+							"host": [
+								"{{server_auth}}"
+							],
+							"path": [
+								"users",
+								"api",
+								"v1.0",
+								"auth",
+								"login"
+							],
+							"query": [
+								{
+									"key": "user",
+									"value": "admin",
+									"disabled": true
+								},
+								{
+									"key": "password",
+									"value": "admin",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Logout",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoxLCJ1c2VybmFtZSI6ImFkbWluIiwiYWRtaW4iOnRydWUsImV4cCI6MTY1ODYzMDA1N30.Qkki9NrU3wKc-x0f4YZt-XSMMOEmosoker2jOLECHzs",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"user\": \"admin\",\n    \"password\": \"admin\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://{{server_auth}}/users/api/v1.0/auth/logout",
+							"protocol": "http",
+							"host": [
+								"{{server_auth}}"
+							],
+							"path": [
+								"users",
+								"api",
+								"v1.0",
+								"auth",
+								"logout"
+							],
+							"query": [
+								{
+									"key": "user",
+									"value": "admin",
+									"disabled": true
+								},
+								{
+									"key": "password",
+									"value": "admin",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Refresh",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoxLCJ1c2VybmFtZSI6ImFkbWluIiwiYWRtaW4iOnRydWUsImV4cCI6MTY1ODcwMTU2NX0.n2R3MLFcwEXHrjBd--rPk9_0SNV6DwcxojSPQaErygQ",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "http://{{server_auth}}/users/api/v1.0/auth/refresh",
+							"protocol": "http",
+							"host": [
+								"{{server_auth}}"
+							],
+							"path": [
+								"users",
+								"api",
+								"v1.0",
+								"auth",
+								"refresh"
+							],
+							"query": [
+								{
+									"key": "user",
+									"value": "admin",
+									"disabled": true
+								},
+								{
+									"key": "password",
+									"value": "admin",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Ping",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://{{server}}/api/1.0/irrigation/ping",
+					"protocol": "http",
+					"host": [
+						"{{server}}"
+					],
+					"path": [
+						"api",
+						"1.0",
+						"irrigation",
+						"ping"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
