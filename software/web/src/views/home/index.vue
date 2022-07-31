@@ -118,6 +118,11 @@ const handleClickEditArea = (area: Area, cb: () => void) => {
   areaController.value = null;
   debug("handleClickEditArea", JSON.stringify(area));
 };
+const handleClickDetailArea = (area: Area, cb: () => void) => {
+  areaController.value = null;
+  debug("handleClickDetailArea", JSON.stringify(area));
+  router.push(`/area/${area.id}`);
+};
 
 const handleClickAddController = (area: Area) => {
   dialog.value = true;
@@ -313,6 +318,7 @@ let areaController: Ref<number | null> = ref(null);
       v-on:expanded="handleClickExpand"
       v-on:addController="handleClickAddController"
       v-on:editArea="handleClickEditArea"
+      v-on:detailArea="handleClickDetailArea"
       v-on:deleteArea="removeArea"
     >
       <template

@@ -1,6 +1,7 @@
 import { createRouter, createWebHistory, NavigationGuard, NavigationGuardNext, RouteLocationNormalized } from "vue-router";
 import HomeView from "../views/home/index.vue";
 import LoginView from "../views/login/index.vue";
+import DetailAreaView from "../views/areas/detail.vue";
 import DetailControllerView from "../views/controllers/detail.vue";
 
 import store from '../store';
@@ -31,6 +32,12 @@ const routes = [
         path: '/controller/:controller',
         name: "detail-controller",
         component: DetailControllerView,
+        meta: { requiresAuth: true }
+    },
+    {
+        path: '/area/:area',
+        name: "detail-area",
+        component: DetailAreaView,
         meta: { requiresAuth: true }
     },
 ];

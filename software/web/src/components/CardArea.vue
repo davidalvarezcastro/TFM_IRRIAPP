@@ -27,6 +27,7 @@ const emit = defineEmits<{
   (e: "shrinked", area: Area | null, cb: () => void): void;
   (e: "addController", cb: () => void): void;
   (e: "editArea", area: Area, cb: () => void): void;
+  (e: "detailArea", area: Area, cb: () => void): void;
   (e: "deleteArea", area: Area, cb: () => void): void;
 }>();
 
@@ -41,6 +42,9 @@ const emitAddController = function (cb: () => void) {
 };
 const emitEditArea = function (area: Area, cb: () => void) {
   emit("editArea", area, cb);
+};
+const emitDetailArea = function (area: Area, cb: () => void) {
+  emit("detailArea", area, cb);
 };
 const emitDeleteArea = function (area: Area, cb: () => void) {
   emit("deleteArea", area, cb);
@@ -84,6 +88,9 @@ const handleClickAddController = () => {
 const handleClickEdit = () => {
   emitEditArea(props.area, () => {});
 };
+const handleClickDetail = () => {
+  emitDetailArea(props.area, () => {});
+};
 const handleClickDelete = () => {
   emitDeleteArea(props.area, () => {});
 };
@@ -123,6 +130,13 @@ const handleClickDelete = () => {
             color="warning"
             icon="mdi-pencil-outline"
             @click="handleClickEdit"
+          />
+
+          <v-btn
+            color="info"
+            icon="mdi-chart-line"
+            @click="handleClickDetail"
+            rounded
           />
 
           <v-btn
