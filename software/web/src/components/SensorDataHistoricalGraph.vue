@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { PropType, computed, watch } from "vue";
-import { empty, getColor } from "../utils/index";
+import { empty, getColor, changeTimezone } from "../utils/index";
 import { SensorData } from "../types/sensor_data";
 import { Chart, registerables, ChartItem } from "chart.js";
 import "chartjs-adapter-moment";
@@ -120,13 +120,14 @@ const handleDraw = (data: SensorData[], redraw: boolean = false): void => {
   let xAxis: Array<string> = [];
   let i = 0;
 
+  console.log(data);
   try {
     const dataInfoTemperature = [];
     const dataInfoHumidity = [];
     const dataInfoRaining = [];
 
     data.forEach((sensor) => {
-      const date = new Date(sensor.date)
+      const date = new Date(changeTimezone(new Date(sensor.date).getTime()))
         .toISOString()
         .split(".")[0]
         .replace("T", " ");

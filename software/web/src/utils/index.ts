@@ -1,5 +1,5 @@
 export { debug } from './logs';
-export { getStringFromDate } from './dates';
+export { getStringFromDate, getTimeZone, getNowDate, changeTimezone } from './dates';
 export { getColor } from './chats';
 
 /**

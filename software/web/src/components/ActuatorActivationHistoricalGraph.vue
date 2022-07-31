@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { PropType, computed, watch } from "vue";
-import { empty, getColor } from "../utils/index";
+import { changeTimezone, empty, getColor } from "../utils/index";
 import { Actuator } from "../types/actuator";
 import { Chart, registerables, ChartItem } from "chart.js";
 import "chartjs-adapter-moment";
@@ -122,11 +122,15 @@ const handleDraw = (data: Actuator[], redraw: boolean = false): void => {
 
     let color = getColor(2);
     data.forEach((actuator) => {
-      const startDate = new Date(actuator.start_date)
+      const startDate = new Date(
+        changeTimezone(new Date(actuator.start_date).getTime())
+      )
         .toISOString()
         .split(".")[0]
         .replace("T", " ");
-      const endDate = new Date(actuator.end_date)
+      const endDate = new Date(
+        changeTimezone(new Date(actuator.end_date).getTime())
+      )
         .toISOString()
         .split(".")[0]
         .replace("T", " ");
