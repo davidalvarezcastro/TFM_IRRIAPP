@@ -138,6 +138,30 @@ services:
     - api
     - mongodb
 
+  processor:
+    container_name: irrigation_processor
+    networks:
+      default:
+        aliases:
+          - irrigation_processor
+    build:
+      context: .
+      dockerfile: ./config/docker/service.Dockerfile
+      args:
+        - LOGS_FOLDER=logs
+        - SERVICE_FILE=run_control_actuator.py
+    restart: always
+    env_file: .env
+    volumes:
+      - ./server/irrigation:/irrigation
+      - ./logs:/irrigation/logs
+      - ./.env:/irrigation/.env
+      - ./server/irrigation/requirements.txt:/irrigation/requirements.txt
+    depends_on:
+    - database-server
+    - api
+    - mongodb
+
   web:
     container_name: irrigation_web
     networks:
