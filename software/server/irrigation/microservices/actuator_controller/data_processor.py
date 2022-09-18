@@ -137,7 +137,7 @@ class SensorDataProcessor(Sub):
                 average_temperature = (
                     sum(list(map(lambda data: data.temperature, last_sensor_data)))) / number_controllers
                 average_humidity = (
-                    sum(list(map(lambda data: data.temperature, last_sensor_data)))) / number_controllers
+                    sum(list(map(lambda data: data.humidity, last_sensor_data)))) / number_controllers
             else:
                 average_temperature = 0
                 average_humidity = 0
